@@ -12,12 +12,20 @@ const BusinessAnalysis = () => {
     setError(null);
     try {
       const res = await axios.post(
-        'http://127.0.0.1:8000/api/v1/business-analysis/?type=analysis',
+        'http://127.0.0.1:8000/api/v1/business-analysis/?type=sowt_analysis_report',
         {
-          email: "mdashsharma95@gmail.com",
-          occurrences: 5,
-          google_link: "https://maps.app.goo.gl/bQuQZdf4DpTFMCZE6",
-          website: "https://example.com"
+          "email": "manish@gmail.in",
+          "occurrences": 5,
+          "name": "VRK DESIGNS",
+          "address": "SMLV Plaza, 2054, Kanakapura Main Rd, next to Vajarahalli metro station, Raghuvanahalli, Bangalore City Municipal Corporation Layout, Bengaluru, Karnataka 560062",
+          "url": "https://maps.app.goo.gl/bQuQZdf4DpTFMCZE6",
+          "phone": "N/A",
+          "rating": 4.5,
+          "reviews": 120,
+          "plus_code": "VGGW+Q5 Bengaluru, Karnataka",
+          "website": "https://business.google.com/create?fp=9187135936770067946&hl=en&authuser=0&gmbsrc=in-en-et-ip-z-gmb-s-z-l~mrc%7Cclaimbz%7Cu&ppsrc=GMBMI&utm_campaign=in-en-et-ip-z-gmb-s-z-l~mrc%7Cclaimbz%7Cu&utm_source=gmb_mrc81&utm_medium=et&getstarted&lis=0",
+          "latitude": 12.8769184,
+          "longitude": 77.5429095
         },
         {
           headers: {
@@ -114,7 +122,7 @@ const BusinessAnalysis = () => {
         </head>
         <body>
           <div class="header">
-            <img src="https://via.placeholder.com/150" alt="Company Logo" class="logo" />
+            <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
             <h1>${analysisData[0]?.heading || 'Business Analysis'}</h1>
             <p class="date">Generated on ${new Date().toLocaleDateString()}</p>
           </div>
@@ -127,8 +135,8 @@ const BusinessAnalysis = () => {
             </div>
           `).join('')}
           <div class="footer">
-            <p>© 2023 Your Company Name. All rights reserved.</p>
-            <p>Contact us at <a href="mailto:info@yourcompany.com">info@yourcompany.com</a></p>
+            <p>© 2025 DoWell UX Living Lab. All rights reserved.</p>
+            <p>Contact us at <a href="mailto:dowell@dowellresearch.uk">dowell@dowellresearch.uk</a></p>
           </div>
         </body>
       </html>

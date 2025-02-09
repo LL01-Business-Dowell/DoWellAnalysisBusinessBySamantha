@@ -38,7 +38,6 @@ def experience_database_services(email, occurrences):
         "occurrences":occurrences
     }
     response = requests.post(url, json=payload)
-    print("theeeiisss ok ",response.status_code)
     return response.text
 
 
@@ -150,12 +149,10 @@ def parse_swot_text(text):
     current_section = None
     current_title = None
     
-    # Split text into lines and process
     lines = text.split('\n')
     for line in lines:
         line = line.strip()
         
-        # Skip empty lines
         if not line:
             continue
             
@@ -173,27 +170,22 @@ def parse_swot_text(text):
             current_section = "threats"
             continue
             
-        # Process bullet points
         if line.startswith('*') and current_section:
             line = line.lstrip('* ')
             
-            # Check if this is a title or description
             if ':**' in line:
-                # It's a title with description
                 title, description = line.split(':**', 1)
                 sections[current_section].append({
                     "title": title.strip(),
                     "description": description.strip()
                 })
             elif ':' in line:
-                # It's a title with description
                 title, description = line.split(':', 1)
                 sections[current_section].append({
                     "title": title.strip(),
                     "description": description.strip()
                 })
             else:
-                # It's a continuation or standalone point
                 sections[current_section].append({
                     "title": "",
                     "description": line.strip()
@@ -204,10 +196,8 @@ def parse_swot_text(text):
 def format_swot_response(raw_text):
     """Main function to process and format SWOT analysis"""
     try:
-        # First parse the text into structured format
         parsed_data = parse_swot_text(raw_text)
         
-        # Format the response
         formatted_response = {
             "success": True,
             "message": "Data retrieved successfully",

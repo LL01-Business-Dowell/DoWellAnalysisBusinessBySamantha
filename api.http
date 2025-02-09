@@ -1,9 +1,47 @@
-## Get Analysis of google map link
-curl -X POST "http://127.0.0.1:8000/api/v1/business-analysis/?type=analysis" \
+
+curl -X POST "http://127.0.0.1:8000/api/v1/business-analysis/?type=business_info" \
      -H "Content-Type: application/json" \
      -d '{
-           "email": "mdashsharma95@gmail.com",
-           "occurrences": 5,
            "google_link": "https://maps.app.goo.gl/bQuQZdf4DpTFMCZE6",
            "website": "https://example.com"
+         }'
+
+###
+
+curl -X POST "http://127.0.0.1:8000/api/v1/business-analysis/?type=sowt_analysis_report" \
+     -H "Content-Type: application/json" \
+     -d '{
+          "email": "manish@dowellresearch.in",
+          "occurrences": 1,
+          "name": "VRK DESIGNS",
+          "address": "SMLV Plaza, 2054, Kanakapura Main Rd, next to Vajarahalli metro station, Raghuvanahalli, Bangalore City Municipal Corporation Layout, Bengaluru, Karnataka 560062",
+          "url": "https://maps.app.goo.gl/bQuQZdf4DpTFMCZE6",
+          "phone": "N/A",
+          "rating": 4.5,
+          "reviews": 120,
+          "plus_code": "VGGW+Q5 Bengaluru, Karnataka",
+          "website": "https://www.google.com/",
+          "latitude": 12.8769184,
+          "longitude": 77.5429095
+     }'
+
+###
+curl -X POST "https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=register_user" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "product_number": "UXLIVINGLAB010",
+           "email": "lucifer25gaming@gmail.com"
+         }'
+
+###
+curl -X GET "https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=get_user_email&product_number=UXLIVINGLAB010&email=lucifer25gaming@gmail.com"
+
+###
+curl -X POST "https://100085.pythonanywhere.com/api/email/" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "toname": "Recipient Name",
+           "toemail": "recipient@example.com",
+           "subject": "Your Email Subject",
+           "email_content": "Hello, this is a test email message."
          }'
