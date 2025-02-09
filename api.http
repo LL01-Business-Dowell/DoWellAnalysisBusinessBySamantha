@@ -1,0 +1,9 @@
+## Get Analysis of google map link
+curl -X POST "http://127.0.0.1:8000/api/v1/business-analysis/?type=analysis" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "email": "mdashsharma95@gmail.com",
+           "occurrences": 5,
+           "google_link": "https://maps.app.goo.gl/bQuQZdf4DpTFMCZE6",
+           "website": "https://example.com"
+         }'
