@@ -29,3 +29,8 @@ export async function sowtAnalysis(body) {
     return response.data;
     
 }
+
+export async function sendEmail(data){
+    const response = await axios.post('https://100085.pythonanywhere.com/api/email/', data);
+    return response.data;
+}

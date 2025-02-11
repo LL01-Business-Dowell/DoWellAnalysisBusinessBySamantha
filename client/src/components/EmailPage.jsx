@@ -28,7 +28,7 @@ function EmailPage() {
       let response = await getUser(email)
       console.log(response);
       
-      if(!response.occurrences == 0) {
+      if(response.occurrences == 0) {
         await register(email)
       }
 

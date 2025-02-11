@@ -53,7 +53,7 @@ def save_experienced_product_data(product_name,email,experienced_data):
 
 
 def update_user_usage(email, occurrences):
-    url = f"https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=update_user_usage&product_number=UXLIVINGLAB001&email={email}&occurrences={occurrences}"
+    url = f"https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=update_user_usage&product_number=UXLIVINGLAB010&email={email}&occurrences={occurrences}"
     response = requests.get(url)
     return response.text
 
