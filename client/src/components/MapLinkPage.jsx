@@ -3,6 +3,7 @@ import SamantaLogo from "../assets/samanta.svg"
 import DowellLogo from "../assets/dowell.png"
 import { analysisBodyAtom, analysisPageEligibleAtom, mapPageEligibleAtom } from '../recoil/atom';
 import { useSetRecoilState } from 'recoil';
+import toast from 'react-hot-toast';
 
 function MapLinkPage() {
   const setAnalysisPageEligible = useSetRecoilState(analysisPageEligibleAtom);
@@ -15,7 +16,7 @@ function MapLinkPage() {
   function handleMapSubmit() {
 
     if(mapLink === "") {
-      alert("Map Link is required.")
+      toast.error("Map Link is required.")
       return
     }
 

@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import SamantaLogo from "../assets/samanta.svg"
 import { getUser, register } from '../services/api.services';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom, userEmailAtom } from '../recoil/atom';
 import { Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 
 function EmailPage() {
@@ -19,7 +20,7 @@ function EmailPage() {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert("Email is invalid.");
+      toast.error("Email is invalid.");
       return;
     }
 
@@ -42,7 +43,7 @@ function EmailPage() {
 
     } catch (error) {
       console.log("Error in checking user.", error);
-      alert("Error, Please try again.")
+      toast.error("Error, Please try again.")
     } finally {
       setIsLoading(false)
     }
