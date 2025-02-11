@@ -11,7 +11,7 @@ function AnalysingPage() {
     const occurrences = useRecoilValue(occurenceAtom);
     const userEmail = useRecoilValue(userEmailAtom);
     const analysisBody = useRecoilValue(analysisBodyAtom);
-    const [isAnalysisComplete, setIsAnalysisComplete] = useState(true);
+    const [isAnalysisComplete, setIsAnalysisComplete] = useState(false);
     const [email, setEmail] = useState(userEmail);
     const [analysisData, setAnalysisData] = useState(null);
     const [isAnalysing, setIsAnalysing] = useState(true);
@@ -46,8 +46,8 @@ function AnalysingPage() {
     }, [])
     
     const formatResponse = () => {
-        if (!swotAnalysisData?.response) return [];
-        const sections = swotAnalysisData.response.split('\n\n');
+        if (!swotAnalysisData) return [];
+        const sections = swotAnalysisData.split('\n\n');
         console.log(sections);
         
         return sections.map(section => {
@@ -62,6 +62,7 @@ function AnalysingPage() {
 
     const handleEmail = async () => {
         const analysisData = formatResponse();
+        console.log(analysisData);
         
         const htmlContent = `
       <!DOCTYPE html>
