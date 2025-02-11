@@ -11,13 +11,10 @@ function App() {
   const analysisPageEligible = useRecoilValue(analysisPageEligibleAtom);
   return (
     <div className='flex w-screen h-screen items-center justify-center'>
-      <div className='flex flex-col items-center justify-center border w-[360px] min-h-[640px] p-3'>
+      <div className='flex flex-col items-center justify-center max-w-[430px] p-3'>
         {emailPageEligible && <EmailPage/> }
         {mapPageEligible && <MapLinkPage/> }
         {analysisPageEligible && <AnalysingPage/>}
-        {/* <AnalysingPage/> */}
-        {/* <EmailPage/> */}
-        {/* <MapLinkPage/> */}
       </div>
     </div>
   );

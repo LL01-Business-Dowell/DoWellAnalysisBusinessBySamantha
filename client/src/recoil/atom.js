@@ -12,6 +12,11 @@ export const analysisBodyAtom = atom({
     default: null
 })
 
+export const userEmailAtom = atom({
+    key: 'userEmail',
+    default: ""
+})
+
 export const emailPageEligibleAtom = atom({
     key: 'emailPageEligible',
     default: true

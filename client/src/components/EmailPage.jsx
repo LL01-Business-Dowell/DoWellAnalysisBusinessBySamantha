@@ -2,34 +2,40 @@ import React, { useState } from 'react'
 import SamantaLogo from "../assets/samanta.svg"
 import { getUser, register } from '../services/api.services';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom } from '../recoil/atom';
+import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom, userEmailAtom } from '../recoil/atom';
+import { Loader2 } from 'lucide-react';
 
 
 function EmailPage() {
+  const setUserEmail = useSetRecoilState(userEmailAtom);
   const setEmailPageEligible = useSetRecoilState(emailPageEligibleAtom);
   const setMapPageEligible = useSetRecoilState(mapPageEligibleAtom);
   const [ occurence, setOccurence ] = useRecoilState(occurenceAtom);
   const [email, setEmail] = useState("");
   const [isEligible, setIsEligible] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function checkUser() {
 
-    if(email === "") return
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Email is invalid.");
+      return;
+    }
 
     try {
+      setIsLoading(true)
       let response = await getUser(email)
       console.log(response);
       
-      if(!response.data) {
-        const responseRegister = await register(email)
-
-        response = await getUser(email);
-
+      if(!response.occurrences == 0) {
+        await register(email)
       }
 
-      if (response.data.occurence <=5 ) {
+      if (response.occurrences <=5 ) {
         setIsEligible(true)
-        setOccurence(response.data.occurence);
+        setOccurence(response.occurrences);
+        setUserEmail(email);
       } else {
         setIsEligible(false)
       }
@@ -37,6 +43,8 @@ function EmailPage() {
     } catch (error) {
       console.log("Error in checking user.", error);
       alert("Error, Please try again.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -50,20 +58,21 @@ function EmailPage() {
         <img src={SamantaLogo}/>
         <p>Samanta can travel anywhere in the world digitally and collect data for analysis</p>
         <input type="text"
-        className='w-full p-2 rounded-2xl border'
+        className='w-full p-2 rounded-2xl border mb-2'
         placeholder='Email'
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         />
-        <button className='bg-green-500 w-full p-2 rounded-2xl text-white font-semibold'
+        {isEligible === null && <button className='flex item-center  justify-center bg-green-500 w-full p-2 rounded-2xl text-white font-semibold'
         onClick={checkUser}
-        >Start</button>
+        >Start{isLoading && <Loader2 className='animate-spin'/>}</button>}
+        
         {isEligible !== null && <div>
-          {occurence && <div>
-            You have {occurence} occurences.
+          {occurence !== undefined && occurence !== null && <div>
+            You have {occurence} occurrences.
           </div> }
           {!isEligible ? <button className='bg-red-400 w-full p-2 rounded-2xl text-white font-semibold'>
-            Buy Credits
+            Contribute
           </button> : <button className='bg-green-500 w-full p-2 rounded-2xl text-white font-semibold'
           onClick={handleContinue}
           >Continue</button> }
