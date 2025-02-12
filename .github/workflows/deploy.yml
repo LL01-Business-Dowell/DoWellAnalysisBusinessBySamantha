@@ -51,8 +51,8 @@ jobs:
           git reset --hard origin/main || { echo "Git pull failed"; exit 1; }
 
           # Verify docker-compose file exists
-          if [ ! -f "docker-compose.prod.yml" ]; then
-            echo "Error: docker-compose.prod.yml not found"
+          if [ ! -f "docker-compose.yml" ]; then
+            echo "Error: docker-compose.yml not found"
             exit 1
           fi
 
