@@ -30,7 +30,7 @@ curl -X POST "https://100105.pythonanywhere.com/api/v3/experience_database_servi
      -H "Content-Type: application/json" \
      -d '{
            "product_number": "UXLIVINGLAB010",
-           "email": "lucifer25gaming@gmail.com"
+           "email": "workfloweric92@gmail.com"
          }'
 
 ###
