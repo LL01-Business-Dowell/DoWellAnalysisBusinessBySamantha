@@ -5,7 +5,8 @@ FROM python:3.11
 WORKDIR /usr/src/app
 
 # Install dependencies for Selenium & Chrome
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends -f \
     wget curl unzip gnupg \
     libx11-6 libxcb1 libxcomposite1 libxdamage1 libxext6 libxfixes3 \
     libxkbcommon0 libxrandr2 xdg-utils libglib2.0-0 libnss3 libgconf-2-4 \
@@ -13,16 +14,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 # Install Google Chrome
-RUN wget -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+RUN apt-get update --fix-missing && apt-get install -f -y && \
+    wget -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
     apt-get install -y /tmp/chrome.deb && rm /tmp/chrome.deb
 
 # Set Chrome binary path for Selenium
 ENV GOOGLE_CHROME_BIN=/usr/bin/google-chrome
 
 # Install Chromedriver
-RUN wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chromedriver-linux64.zip && \
+# Install Chromedriver using LATEST_RELEASE
+# Install Chromedriver using LATEST_RELEASE_STABLE (Corrected URL)
+RUN CHROME_DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE") && \
+    wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && rm /tmp/chromedriver.zip
-
 # Set Chromedriver path for Selenium
 ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
 

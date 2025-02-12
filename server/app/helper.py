@@ -79,8 +79,19 @@ def get_google_maps_details(url):
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
-
-    service = Service(ChromeDriverManager().install())
+    chrome_binary_path = os.environ.get('GOOGLE_CHROME_BIN') # Get from ENV
+    if not chrome_binary_path:
+        chrome_binary_path = "/usr/bin/google-chrome"
+    # options.binary_location = chrome_binary_path
+    options.setBinary(chrome_binary_path);
+    # chrome_driver = 
+    chromedriver_path = os.environ.get('CHROMEDRIVER_PATH') # Get from ENV
+    if not chromedriver_path:
+        # Fallback in case the ENV var isn't set correctly in your environment when running (less likely in Docker if Dockerfile is correct)
+        chromedriver_path = "/usr/local/bin/chromedriver" 
+    # service = Service(ChromeDriverManager().install())
+    service = Service(chromedriver_path)
+    
     driver = webdriver.Chrome(service=service, options=options)
 
     try:
