@@ -25,7 +25,7 @@ ENV GOOGLE_CHROME_BIN=/usr/bin/google-chrome
 # Install Chromedriver using LATEST_RELEASE
 # Install Chromedriver using LATEST_RELEASE_STABLE (Corrected URL)
 RUN CHROME_DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE") && \
-    wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" && \
+    wget -O /tmp/chromedriver.zip "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.53/linux64/chromedriver-linux64.zip" && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && rm /tmp/chromedriver.zip
 # Set Chromedriver path for Selenium
 ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
