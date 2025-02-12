@@ -82,8 +82,8 @@ def get_google_maps_details(url):
     chrome_binary_path = os.environ.get('GOOGLE_CHROME_BIN') # Get from ENV
     if not chrome_binary_path:
         chrome_binary_path = "/usr/bin/google-chrome"
-    # options.binary_location = chrome_binary_path
-    options.setBinary(chrome_binary_path);
+    options.binary_location = chrome_binary_path
+    # options.setBinary(chrome_binary_path);
     # chrome_driver = 
     chromedriver_path = os.environ.get('CHROMEDRIVER_PATH') # Get from ENV
     if not chromedriver_path:
