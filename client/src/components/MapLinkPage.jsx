@@ -6,6 +6,9 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { Loader2, RotateCw } from 'lucide-react';
 import { analysis } from '../services/api.services';
 import MapComponent from './MapComponent';
+import { analysisBodyAtom, analysisPageEligibleAtom, mapPageEligibleAtom } from '../recoil/atom';
+import { useSetRecoilState } from 'recoil';
+import toast from 'react-hot-toast';
 
 function MapLinkPage() {
   const setAnalysisPageEligible = useSetRecoilState(analysisPageEligibleAtom);
@@ -19,7 +22,7 @@ function MapLinkPage() {
   async function handleMapSubmit() {
 
     if(mapLink === "") {
-      alert("Map Link is required.")
+      toast.error("Map Link is required.")
       return
     }
     try {

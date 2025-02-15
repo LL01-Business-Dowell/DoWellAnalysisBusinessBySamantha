@@ -20,12 +20,12 @@ export async function register(email) {
 }
 
 export async function analysis(body) {
-    const response = await axios.post(`${BACKEND_URL}/api/v1/business-analysis/?type=business_info`, body);
+    const response = await axios.post(`${BACKEND_URL}/v1/business-analysis/?type=business_info`, body);
     return response.data
 }   
 
 export async function sowtAnalysis(body) {
-    const response = await axios.post(`${BACKEND_URL}/api/v1/business-analysis/?type=sowt_analysis_report`, body);
+    const response = await axios.post(`${BACKEND_URL}/v1/business-analysis/?type=sowt_analysis_report`, body);
     return response.data;
     
 }

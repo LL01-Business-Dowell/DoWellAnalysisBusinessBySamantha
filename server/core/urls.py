@@ -7,5 +7,5 @@ from .views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', healthCheck.as_view()),
-    path('api/v1/', include('app.urls')),
+    path('v1/', include('app.urls')),
 ]
