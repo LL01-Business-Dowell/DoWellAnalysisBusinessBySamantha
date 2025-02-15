@@ -3,7 +3,7 @@ import SamantaLogo from "../assets/samanta.svg"
 import { getUser, register } from '../services/api.services';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom, userEmailAtom } from '../recoil/atom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RotateCw } from 'lucide-react';
 
 
 function EmailPage() {
@@ -54,11 +54,16 @@ function EmailPage() {
   }
 
   return (
-    <div className='text-center p-10'>
+    <div className='relative text-center p-10'>
+        <RotateCw
+        size={20}
+        className='absolute top-2 right-8 p-1 bg-green-500 rounded-full'
+        onClick={() => window.location.reload()}
+        />
         <img src={SamantaLogo}/>
         <p>Samanta can travel anywhere in the world digitally and collect data for analysis</p>
         <input type="text"
-        className='w-full p-2 rounded-2xl border mb-2'
+        className='w-full p-2 rounded-2xl border my-2'
         placeholder='Email'
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -68,7 +73,7 @@ function EmailPage() {
         >Start{isLoading && <Loader2 className='animate-spin'/>}</button>}
         
         {isEligible !== null && <div>
-          {occurence !== undefined && occurence !== null && <div>
+          {occurence !== undefined && occurence !== null && occurence !== 0 && <div>
             You have {occurence} occurrences.
           </div> }
           {!isEligible ? <button className='bg-red-400 w-full p-2 rounded-2xl text-white font-semibold'>

@@ -12,6 +12,11 @@ export const analysisBodyAtom = atom({
     default: null
 })
 
+export const analysisDataAtom = atom({
+    key: 'analysisData',
+    default: null
+})
+
 export const userEmailAtom = atom({
     key: 'userEmail',
     default: ""

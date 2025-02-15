@@ -4,35 +4,34 @@ import SamantaLogo from "../assets/samanta.svg";
 import DowellLogo from "../assets/dowell.png"
 import { analysis, sendEmail, sowtAnalysis } from '../services/api.services'
 import { useRecoilValue } from 'recoil'
-import { analysisBodyAtom, occurenceAtom, userEmailAtom } from '../recoil/atom'
-import { Loader2 } from 'lucide-react';
+import { analysisBodyAtom, analysisDataAtom, occurenceAtom, userEmailAtom } from '../recoil/atom'
+import { Loader2, X } from 'lucide-react';
 
 function AnalysingPage() {
     const occurrences = useRecoilValue(occurenceAtom);
     const userEmail = useRecoilValue(userEmailAtom);
-    const analysisBody = useRecoilValue(analysisBodyAtom);
     const [isAnalysisComplete, setIsAnalysisComplete] = useState(false);
     const [email, setEmail] = useState(userEmail);
-    const [analysisData, setAnalysisData] = useState(null);
+    const analysisData = useRecoilValue(analysisDataAtom);
     const [isAnalysing, setIsAnalysing] = useState(true);
     const [swotAnalysisData, setSwotAnalysisData] = useState("");
+    const [isResendDisabled, setIsResendDisabled] = useState(false);
+    const [countdown, setCountdown] = useState(0);
 
     useEffect(() => {
         async function analyze() {
             try {
                 setIsAnalysing(true)
-                const response = await analysis(analysisBody);
-                console.log(response);
+                console.log(analysisData);
                 
-                setAnalysisData(response.response)
-
                 const swotResponse = await sowtAnalysis({
-                    ...response.response,
-                    email: userEmail,
-                    rating: parseInt(response.response.rating, 10),
-                    reviews: parseInt(response.response.reviews.match(/\d+/)[0], 10),
-                    occurrences: occurrences
+                  ...analysisData,
+                  email: userEmail,
+                  rating: parseInt(analysisData.rating, 10),
+                  reviews: parseInt(analysisData.reviews.match(/\d+/)[0], 10),
+                  occurrences: occurrences
                 })
+                await handleEmail()
                 setSwotAnalysisData(swotResponse.response)
                 setIsAnalysing(false)
                 setIsAnalysisComplete(true)
@@ -44,6 +43,16 @@ function AnalysingPage() {
         }
         analyze()
     }, [])
+
+    useEffect(() => {
+      let timer;
+      if (countdown > 0) {
+          timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      } else {
+          setIsResendDisabled(false);
+      }
+      return () => clearTimeout(timer);
+    }, [countdown]);
     
     const formatResponse = () => {
         if (!swotAnalysisData) return [];
@@ -61,8 +70,9 @@ function AnalysingPage() {
     };
 
     const handleEmail = async () => {
-        const analysisData = formatResponse();
-        console.log(analysisData);
+      const analysisData = formatResponse();
+      setIsResendDisabled(true);
+      setCountdown(60);
         
         const htmlContent = `
       <!DOCTYPE html>
@@ -162,23 +172,28 @@ function AnalysingPage() {
     };
 
     return (
-        <div className='flex flex-col justify-between w-full h-full min-h-[640px]'>
+        <div className='relative flex flex-col justify-between w-full h-full min-h-[640px]'>
+            <X
+            size={20}
+            className='absolute top-2 right-8 p-1 text-white bg-red-500 rounded-full'
+            onClick={() => window.location.reload()}
+            />
             <div className='flex flex-col space-y-3 px-15'>
-                {isAnalysing ? <p className='text-red-500 text-sm'>Analysing your business...{isAnalysing && <Loader2 size={12} className='animate-spin flex'/>}</p> : <p className='text-sm'>Report prepared.</p>}
-                <div className='border rounded-2xl w-full h-full overflow-hidden min-h-60 min-w-50'>
+                {isAnalysing ? <p className='text-red-500 text-sm'>Analysing your business...{isAnalysing && <Loader2 size={12} className='animate-spin flex'/>}</p> : <p className='text-sm text-red-500 '>Report prepared.</p>}
+                <div className='border rounded-2xl w-full h-full overflow-hidden min-h-60 max-w-50'>
                     {analysisData && <MapComponent lat={analysisData.latitude} lng={analysisData.longitude}/>}
                 </div>
             </div>
             {isAnalysisComplete && <div className='flex flex-col space-y-2'>
-                <p>Share your email to send report.</p>    
-                <input type="text" className='p-2 w-full border rounded-2xl'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                />
+              Report sent to check {email} <br/> check your inbox <br/>
+              Thank you
                 <button
-                className='bg-green-500 p-2 rounded-2xl w-full'
+                className='bg-green-500 p-2 rounded-2xl w-full disabled:cursor-not-allowed'
                 onClick={handleEmail}
-                >Send</button>
+                disabled={isResendDisabled}
+                >
+                  {isResendDisabled ? `Please wait ${countdown} seconds to resend.` : 'Resend'}
+                </button>
             </div>}
             <div className='relative flex pr-5 pb-5 overflow-hidden'>
                 <div className='flex-grow'>
