@@ -32,7 +32,7 @@ function MapLinkPage() {
       setIsMapLinkSubmitted(true)
       
     } catch (error) {
-      alert("Please try again later.")
+      toast.error("Please try again later.")
       console.error(error);
       
     } finally {
