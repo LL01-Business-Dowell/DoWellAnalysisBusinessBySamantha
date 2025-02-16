@@ -4,7 +4,6 @@ import { getUser, register } from '../services/api.services';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom, userEmailAtom } from '../recoil/atom';
 import { Loader2, RotateCw } from 'lucide-react';
-import { Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 
