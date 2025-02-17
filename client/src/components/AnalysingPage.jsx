@@ -6,6 +6,7 @@ import { analysis, sendEmail, sowtAnalysis } from '../services/api.services'
 import { useRecoilValue } from 'recoil'
 import { analysisDataAtom, occurenceAtom, userEmailAtom } from '../recoil/atom'
 import { Loader2, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 function AnalysingPage() {
     const occurrences = useRecoilValue(occurenceAtom);
@@ -125,13 +126,13 @@ function AnalysingPage() {
           const response = await sendEmail(emailData);
       
           if (response.success) {
-            alert('Email sent successfully!');
+            toast.success('Email sent successfully!');
           } else {
-            alert('Failed to send email: ' + (response.message || 'Unknown error'));
+            toast.error('Failed to send email: ' + (response.message || 'Unknown error'));
           }
       } catch (error) {
           console.error('Error sending email:', error);
-          alert('Failed to send email. Please try again later.');
+          toast.error('Failed to send email. Please try again later.');
       }
   };
 
