@@ -28,11 +28,17 @@ function MapLinkPage() {
       const response = await analysis({
         google_link: mapLink,
       });
+      const isInvalidResponse = Object.values(response.response).includes("N/A");
+  
+      if (isInvalidResponse) {
+        throw new Error("Invalid map link.");
+      }
+      
       setAnalysisData(response.response)
       setIsMapLinkSubmitted(true)
       
     } catch (error) {
-      toast.error("Please try again later.")
+      toast.error(error.message || "Please try again later.");
       console.error(error);
       
     } finally {
