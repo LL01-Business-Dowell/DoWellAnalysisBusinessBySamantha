@@ -96,7 +96,7 @@ function AnalysingPage() {
       <body>
         <div class="header">
           <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
-          <h1>${analysisData[0]?.heading || 'Business Analysis'}</h1>
+          <h1>Business analysis from Samanta AI... analysing customer perspectives</h1>
           <p class="date">Generated on ${new Date().toLocaleDateString()}</p>
         </div>
         ${analysisData.slice(1).map(section => `
