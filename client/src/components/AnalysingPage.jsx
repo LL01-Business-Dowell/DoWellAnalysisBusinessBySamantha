@@ -108,7 +108,7 @@ function AnalysingPage() {
           </div>
         `).join('')}
         <div class="footer">
-          <p>© 2025 DoWell UX Living Lab. All rights reserved.</p>
+          <p>© DoWell UX Living Lab. All rights reserved.</p>
           <p>Contact us at <a href="mailto:dowell@dowellresearch.uk">dowell@dowellresearch.uk</a></p>
         </div>
       </body>
