@@ -142,7 +142,7 @@ def gemini_ai(api_key,prompt):
 def new_gemini(api_key, prompt):
     genai.configure(api_key=api_key)
     try:
-        model = genai.GenerativeModel("gemini-pro")
+        model = genai.GenerativeModel("gemini-1.5-pro-latest")
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:

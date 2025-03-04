@@ -8,11 +8,11 @@ curl -X POST "http://127.0.0.1:8000/api/v1/business-analysis/?type=business_info
 
 ###
 
-curl -X POST "http://127.0.0.1:8000/api/v1/business-analysis/?type=sowt_analysis_report" \
+curl -X POST "https://samantaanalysis.uxlivinglab.online/api/v1/business-analysis/?type=sowt_analysis_report" \
      -H "Content-Type: application/json" \
      -d '{
           "email": "manish@dowellresearch.in",
-          "occurrences": 10,
+          "occurrences": 1,
           "name": "VRK DESIGNS",
           "address": "SMLV Plaza, 2054, Kanakapura Main Rd, next to Vajarahalli metro station, Raghuvanahalli, Bangalore City Municipal Corporation Layout, Bengaluru, Karnataka 560062",
           "url": "https://maps.app.goo.gl/bQuQZdf4DpTFMCZE6",
