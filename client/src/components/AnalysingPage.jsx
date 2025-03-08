@@ -34,107 +34,209 @@ function AnalysingPage() {
       });
     };
 
-  const handleEmail = async () => {
-    const analysisData = formatResponse();
-    setIsResendDisabled(true);
-    setCountdown(60);
-      
+    const handleEmail = async () => {
+      const analysisData = formatResponse();
+      setIsResendDisabled(true);
+      setCountdown(60);
+        
+      // Build the feedback URL base
+      const feedbackBaseUrl = "https://www.scales.uxlivinglab.online/api/v1/create-response/?user=True&scale_type=nps&channel=channel_1&instance=instance_1&workspace_id=6385c0e48eca0fb652c9447b&username=HeenaK&scale_id=665d95ae7ee426d671222a7b&item=";
+        
       const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>${analysisData[0]?.heading || 'Business Analysis'}</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 30px;
-          }
-          .logo {
-            max-width: 150px;
-            margin-bottom: 20px;
-          }
-          h1 {
-            color: #1a365d;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-          }
-          h2 {
-            color: #2d3748;
-            margin-top: 30px;
-          }
-          ul {
-            padding-left: 20px;
-          }
-          li {
-            margin-bottom: 10px;
-          }
-          .date {
-            color: #718096;
-            font-size: 0.9em;
-            text-align: center;
-            margin-bottom: 20px;
-          }
-          .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
-            text-align: center;
-            font-size: 0.9em;
-            color: #718096;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
-          <h1>Business analysis from Samanta AI... analysing customer perspectives</h1>
-          <p class="date">Generated on ${new Date().toLocaleDateString()}</p>
-        </div>
-        ${analysisData.slice(1).map(section => `
-          <div>
-            <h2>${section.heading}</h2>
-            <ul>
-              ${section.content.map(item => `<li>${item}</li>`).join('')}
-            </ul>
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${analysisData[0]?.heading || 'Business Analysis'}</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 800px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+            }
+            .logo {
+              max-width: 150px;
+              margin-bottom: 20px;
+            }
+            h1 {
+              color: #1a365d;
+              border-bottom: 2px solid #e2e8f0;
+              padding-bottom: 10px;
+              margin-bottom: 20px;
+            }
+            h2 {
+              color: #2d3748;
+              margin-top: 30px;
+            }
+            ul {
+              padding-left: 20px;
+            }
+            li {
+              margin-bottom: 10px;
+            }
+            .date {
+              color: #718096;
+              font-size: 0.9em;
+              text-align: center;
+              margin-bottom: 20px;
+            }
+            .footer {
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 1px solid #e2e8f0;
+              text-align: center;
+              font-size: 0.9em;
+              color: #718096;
+            }
+            .feedback-section {
+              margin: 40px auto;
+              text-align: center;
+              padding: 20px;
+              background-color: #f8f9fa;
+              border-radius: 8px;
+              max-width: 600px;
+            }
+            .rating-question {
+              font-weight: bold;
+              font-size: 18px;
+              color: #1a365d;
+              margin-bottom: 15px;
+              text-align: center;
+            }
+            .rating-table {
+              width: 100%;
+              margin: 20px auto;
+              text-align: center;
+              border-collapse: separate;
+              border-spacing: 5px;
+            }
+            .rating-button {
+              display: inline-block;
+              width: 45px;
+              height: 45px;
+              line-height: 45px;
+              text-align: center;
+              border-radius: 50%;
+              font-weight: bold;
+              text-decoration: none;
+            }
+            .low-rating {
+              background-color: #fed7d7;
+              color: #c53030;
+            }
+            .mid-rating {
+              background-color: #fefcbf;
+              color: #b7791f;
+            }
+            .high-rating {
+              background-color: #c6f6d5;
+              color: #2f855a;
+            }
+            .rating-button:hover {
+              opacity: 0.8;
+            }
+            .rating-labels {
+              width: 100%;
+              margin: 10px auto;
+              display: table;
+            }
+            .label-left {
+              text-align: left;
+              display: table-cell;
+              color: #4a5568;
+              font-size: 14px;
+            }
+            .label-right {
+              text-align: right;
+              display: table-cell;
+              color: #4a5568;
+              font-size: 14px;
+            }
+            @media only screen and (max-width: 600px) {
+              .rating-button {
+                width: 35px;
+                height: 35px;
+                line-height: 35px;
+                font-size: 14px;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
+            <h1>${analysisData[0]?.heading ? `Business analysis of ${analysisData[0].heading} from Samanta AI... analysing customer perspectives` : 'Business analysis from Samanta AI... analysing customer perspectives'}</h1>
+            <p class="date">Generated on ${new Date().toLocaleDateString()}</p>
           </div>
-        `).join('')}
-        <div class="footer">
-          <p>© DoWell UX Living Lab. All rights reserved.</p>
-          <p>Contact us at <a href="mailto:dowell@dowellresearch.uk">dowell@dowellresearch.uk</a></p>
-        </div>
-      </body>
-    </html>
-  `;
-
-      try {
-          const emailData = {
-            toname: email, 
-            toemail: email, 
-            subject: '🚀 Unlock Data-Driven Business Insights with Samanta AI – Get Customer perspective',
-            email_content: htmlContent,
-          };
-      
-          const response = await sendEmail(emailData);
-      
-          if (response.success) {
-            toast.success('Email sent successfully!');
-          } else {
-            toast.error('Failed to send email: ' + (response.message || 'Unknown error'));
-          }
-      } catch (error) {
-          console.error('Error sending email:', error);
-          toast.error('Failed to send email. Please try again later.');
-      }
-  };
+          ${analysisData.slice(1).map(section => `
+            <div>
+              <h2>${section.heading}</h2>
+              <ul>
+                ${section.content.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+          `).join('')}
+          
+          <!-- Feedback Rating Section -->
+          <div class="feedback-section">
+            <p class="rating-question">Would you recommend our analysis to your friends and colleagues?</p>
+            <p>Tell us what you think using the scale below!</p>
+            
+            <!-- Using a table for better centering in email clients -->
+            <table class="rating-table" cellpadding="0" cellspacing="5" align="center">
+              <tr>
+                ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(rating => `
+                  <td>
+                    <a href="${feedbackBaseUrl}${rating}" class="rating-button ${
+                      rating <= 6 ? 'low-rating' : rating <= 8 ? 'mid-rating' : 'high-rating'
+                    }">${rating}</a>
+                  </td>
+                `).join('')}
+              </tr>
+            </table>
+            
+            <div class="rating-labels">
+              <div class="label-left">Not at all likely</div>
+              <div class="label-right">Extremely likely</div>
+            </div>
+          </div>
+          
+          <div class="footer">
+            <p>© DoWell UX Living Lab. All rights reserved.</p>
+            <p>Contact us at <a href="mailto:dowell@dowellresearch.uk">dowell@dowellresearch.uk</a></p>
+            <p>Powered by uxlivinglab</p>
+          </div>
+        </body>
+      </html>
+    `;
+  
+        try {
+            const emailData = {
+              toname: email, 
+              toemail: email, 
+              subject: '🚀 Business analysis from Samanta AI... analysing customer perspectives',
+              email_content: htmlContent,
+            };
+        
+            const response = await sendEmail(emailData);
+        
+            if (response.success) {
+              toast.success('Email sent successfully!');
+            } else {
+              toast.error('Failed to send email: ' + (response.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error sending email:', error);
+            toast.error('Failed to send email. Please try again later.');
+        }
+    };
 
     useEffect(() => {
         async function analyze() {

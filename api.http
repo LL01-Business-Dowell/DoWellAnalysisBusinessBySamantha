@@ -1,8 +1,8 @@
 
-curl -X POST "http://127.0.0.1:8000/api/v1/business-analysis/?type=business_info" \
+curl -X POST "https://samantaanalysis.uxlivinglab.online/api/v1/business-analysis/?type=business_info" \
      -H "Content-Type: application/json" \
      -d '{
-           "google_link": "https://maps.app.goo.gl/bQuQZdf4DpTFMCZE6",
+           "google_link": "https://www.google.com/maps/place/Seematti/@9.9852108,76.2801247,17z/data=!3m1!4b1!4m6!3m5!1s0x3b0872b11939e187:0xdebcaecf7d5caa89!8m2!3d9.9852108!4d76.2826996!16s%2Fg%2F1tkslsyt!5m1!1e1?entry=ttu&g_ep=EgoyMDI1MDIyNi4xIKXMDSoJLDEwMjExNDU1SAFQAw%3D%3D",
            "website": "https://example.com"
          }'
 
@@ -13,16 +13,16 @@ curl -X POST "https://samantaanalysis.uxlivinglab.online/api/v1/business-analysi
      -d '{
           "email": "manish@dowellresearch.in",
           "occurrences": 1,
-          "name": "VRK DESIGNS",
-          "address": "SMLV Plaza, 2054, Kanakapura Main Rd, next to Vajarahalli metro station, Raghuvanahalli, Bangalore City Municipal Corporation Layout, Bengaluru, Karnataka 560062",
-          "url": "https://maps.app.goo.gl/bQuQZdf4DpTFMCZE6",
-          "phone": "N/A",
+          "name": "Seematti",
+          "address": "Old No 40/9805, New No 66, 4688, Mahatma Gandhi Rd, Kacheripady, Ernakulam, Kerala 682035",
+          "url": "https://www.google.com/maps/place/Seematti/@9.9852108,76.2801247,17z/data=!3m1!4b1!4m6!3m5!1s0x3b0872b11939e187:0xdebcaecf7d5caa89!8m2!3d9.9852108!4d76.2826996!16s%2Fg%2F1tkslsyt!5m1!1e1?entry=ttu&g_ep=EgoyMDI1MDIyNi4xIKXMDSoJLDEwMjExNDU1SAFQAw%3D%3D",
+          "phone": "0484 411 2233",
           "rating": 4.5,
-          "reviews": 120,
-          "plus_code": "VGGW+Q5 Bengaluru, Karnataka",
-          "website": "https://www.google.com/",
-          "latitude": 12.8769184,
-          "longitude": 77.5429095
+          "reviews": 12,
+          "plus_code": "X7PM+33 Ernakulam, Kerala",
+          "website": "https://seematti.com/",
+          "latitude": 9.9852108,
+          "longitude":76.2826996
      }'
 
 ###
