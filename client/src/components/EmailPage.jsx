@@ -64,7 +64,11 @@ function EmailPage() {
 
   function handlePrice() {
     // Redirect to pricing page
-    window.open("https://dowellpay.online", "_blank");
+    window.open("https://dowellpay.online/analysis-by-samanta-ai/", "_blank");
+  }
+
+  function handleWebsite(){
+    window.open("https://samanta.uk/", "_blank");
   }
 
   function handleAgree() {
@@ -125,7 +129,7 @@ function EmailPage() {
             <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fadeIn">
               {/* Header */}
               <div className="bg-green-500 p-4 text-white">
-                <h2 className="text-xl font-bold">Term and Conditions</h2>
+                <h2 className="text-xl font-bold">Terms and Conditions</h2>
               </div>
               
               {/* Content */}
@@ -171,7 +175,7 @@ function EmailPage() {
           </div>
         }
         
-        <p className='text-gray-500 text-sm mt-5'>DoWell UX Living Lab</p>
+        <p onClick= {handleWebsite} className='text-gray-500 text-sm mt-5'>DoWell UX Living Lab</p>
     </div>
   )
 }
