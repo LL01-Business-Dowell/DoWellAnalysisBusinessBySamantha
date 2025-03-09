@@ -21,19 +21,39 @@ function AnalysingPage() {
 
     const formatResponse = () => {
       if (!swotAnalysisData) return [];
-      const sections = swotAnalysisData.split('\n\n');
-      console.log(sections);
       
-      return sections.map(section => {
-        const lines = section.split('\n');
-        const heading = lines[0].replace(/\*\*/g, '').trim();
-        const content = lines.slice(1)
-          .map(line => line.replace(/\*|\*/g, '').trim())
-          .filter(line => line.length > 0);
-        return { heading, content };
+      // Split by section headers (Strengths, Weaknesses, etc.)
+      const sections = [];
+      let currentSection = null;
+      let title = '';
+      
+      // First, extract the title from the first lines
+      const lines = swotAnalysisData.split('\n');
+      if (lines[0].startsWith('## ')) {
+        title = lines[0].replace('## ', '');
+        lines.shift(); // Remove the title line
+      }
+      
+      sections.push({ heading: title, content: [] });
+      
+      // Process each line to extract sections properly
+      lines.forEach(line => {
+        if (line.startsWith('**') && line.endsWith(':**')) {
+          // This is a section header like "**Strengths:**"
+          currentSection = line.replace(/\*\*/g, '').replace(':', '');
+          sections.push({ heading: currentSection, content: [] });
+        } else if (line.trim().startsWith('* ') && currentSection) {
+          // This is a bullet point under a section
+          const bulletPoint = line.trim().replace('* ', '').replace(/\*\*/g, '');
+          if (bulletPoint.trim().length > 0) {
+            sections[sections.length - 1].content.push(bulletPoint);
+          }
+        }
       });
+      
+      return sections;
     };
-
+    
     const handleEmail = async () => {
       const analysisData = formatResponse();
       setIsResendDisabled(true);
@@ -41,7 +61,8 @@ function AnalysingPage() {
         
       // Build the feedback URL base
       const feedbackBaseUrl = "https://www.scales.uxlivinglab.online/api/v1/create-response/?user=True&scale_type=nps&channel=channel_1&instance=instance_1&workspace_id=6385c0e48eca0fb652c9447b&username=HeenaK&scale_id=665d95ae7ee426d671222a7b&item=";
-        
+      
+      const productUrl = "https://samantaanalysis.uxlivinglab.online/"
       const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -72,8 +93,9 @@ function AnalysingPage() {
               margin-bottom: 20px;
             }
             h2 {
-              color: #2d3748;
+              color: #c53030; /* Red color for section headings */
               margin-top: 30px;
+              font-weight: bold;
             }
             ul {
               padding-left: 20px;
@@ -159,11 +181,38 @@ function AnalysingPage() {
               color: #4a5568;
               font-size: 14px;
             }
+            .swot-section {
+              margin-bottom: 25px;
+              border-left: 4px solid #c53030;
+              padding-left: 15px;
+            }
+              .product-button-container {
+              text-align: center;
+              margin: 30px auto;
+            }
+            .product-button {
+              display: inline-block;
+              background-color: #00C950;
+              color: white;
+              font-weight: bold;
+              padding: 12px 24px;
+              border-radius: 6px;
+              text-decoration: none;
+              font-size: 16px;
+              transition: background-color 0.3s;
+            }
+            .product-button:hover {
+              background-color: #00C950;
+        }
             @media only screen and (max-width: 600px) {
               .rating-button {
                 width: 35px;
                 height: 35px;
                 line-height: 35px;
+                font-size: 14px;
+              }
+              .product-button {
+                padding: 10px 20px;
                 font-size: 14px;
               }
             }
@@ -175,14 +224,20 @@ function AnalysingPage() {
             <h1>${analysisData[0]?.heading ? `Business analysis of ${analysisData[0].heading} from Samanta AI... analysing customer perspectives` : 'Business analysis from Samanta AI... analysing customer perspectives'}</h1>
             <p class="date">Generated on ${new Date().toLocaleDateString()}</p>
           </div>
+          
           ${analysisData.slice(1).map(section => `
-            <div>
+            <div class="swot-section">
               <h2>${section.heading}</h2>
               <ul>
                 ${section.content.map(item => `<li>${item}</li>`).join('')}
               </ul>
             </div>
           `).join('')}
+
+          <!-- Product Button Section -->
+          <div class="product-button-container">
+            <a href="${productUrl}" class="product-button">Try Samanta AI for Your Business</a>
+          </div>
           
           <!-- Feedback Rating Section -->
           <div class="feedback-section">
@@ -216,26 +271,26 @@ function AnalysingPage() {
         </body>
       </html>
     `;
-  
-        try {
-            const emailData = {
-              toname: email, 
-              toemail: email, 
-              subject: '🚀 Business analysis from Samanta AI... analysing customer perspectives',
-              email_content: htmlContent,
-            };
-        
-            const response = await sendEmail(emailData);
-        
-            if (response.success) {
-              toast.success('Email sent successfully!');
-            } else {
-              toast.error('Failed to send email: ' + (response.message || 'Unknown error'));
-            }
-        } catch (error) {
-            console.error('Error sending email:', error);
-            toast.error('Failed to send email. Please try again later.');
+    
+      try {
+        const emailData = {
+          toname: email, 
+          toemail: email, 
+          subject: '🚀 Business analysis from Samanta AI... analysing customer perspectives',
+          email_content: htmlContent,
+        };
+    
+        const response = await sendEmail(emailData);
+    
+        if (response.success) {
+          toast.success('Email sent successfully!');
+        } else {
+          toast.error('Failed to send email: ' + (response.message || 'Unknown error'));
         }
+      } catch (error) {
+        console.error('Error sending email:', error);
+        toast.error('Failed to send email. Please try again later.');
+      }
     };
 
     useEffect(() => {
