@@ -30,7 +30,7 @@ function AnalysingPage() {
       // First, extract the title from the first lines
       const lines = swotAnalysisData.split('\n');
       if (lines[0].startsWith('## ')) {
-        title = lines[0].replace('## ', '');
+        title = lines[0].replace('## ', '').replace('SWOT Analysis of ', '');
         lines.shift(); // Remove the title line
       }
       
@@ -223,7 +223,7 @@ function AnalysingPage() {
           <div class="header">
             <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
             <h1>${analysisData[0]?.heading ? `Business analysis of ${analysisData[0].heading} from Samanta AI... analysing customer perspectives` : 'Business analysis from Samanta AI... analysing customer perspectives'}</h1>
-            <p class="date">Generated on ${new Date().toLocaleDateString()}</p>
+            <p class="date">Generated on ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
           </div>
           
           ${analysisData.slice(1).map(section => `
