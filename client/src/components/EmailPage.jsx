@@ -1,10 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import SamantaLogo from "../assets/samanta.svg"
 import { getUser, register } from '../services/api.services';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom, userEmailAtom } from '../recoil/atom';
-import { Loader2, RotateCw, CheckCircle, X } from 'lucide-react';
+import { Loader2, RotateCw, CheckCircle, X, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function EmailPage() {
@@ -16,6 +16,17 @@ function EmailPage() {
   const [isEligible, setIsEligible] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  useEffect(() => {
+    // Show tooltip for 3 seconds when component mounts
+    setShowTooltip(true);
+    const timer = setTimeout(() => {
+      setShowTooltip(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   async function checkUser() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,6 +87,10 @@ function EmailPage() {
     handleContinue();
   }
 
+  function openHelpVideo() {
+    window.open("https://youtube.com/shorts/esuXEo8rulA?si=RT97O3t6An54ZLwV", "_blank");
+  }
+
   return (
     <div className='relative text-center p-10'>
         <RotateCw
@@ -93,12 +108,29 @@ function EmailPage() {
           onChange={(e) => setEmail(e.target.value)}
         />
         {isEligible === null && 
-          <button 
-            className='flex items-center justify-center bg-green-500 w-full p-2 rounded-2xl text-white font-semibold'
-            onClick={checkUser}
-          >
-            Start {isLoading && <Loader2 className='ml-2 animate-spin'/>}
-          </button>
+          <div className="relative flex items-center">
+            <button 
+              className='flex items-center justify-center bg-green-500 w-full p-2 rounded-2xl text-white font-semibold'
+              onClick={checkUser}
+            >
+              Start {isLoading && <Loader2 className='ml-2 animate-spin'/>}
+            </button>
+            <div className="relative ml-2">
+              <button 
+                className='flex items-center justify-center bg-green-500 p-2 rounded-full text-white'
+                onClick={openHelpVideo}
+                onMouseEnter={() => setShowTooltip(true)}
+                onMouseLeave={() => setShowTooltip(false)}
+              >
+                <Info size={20} />
+              </button>
+              {showTooltip && (
+                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                  Help video
+                </div>
+              )}
+            </div>
+          </div>
         }
         
         {isEligible !== null && !showPaymentPopup && 
@@ -135,9 +167,6 @@ function EmailPage() {
               {/* Content */}
               <div className="p-6">
                 <div className="flex items-start mb-4">
-                  {/* <div className="bg-green-100 p-2 rounded-full mr-3 mt-1">
-                    <DollarSign size={20} className="text-green-600" />
-                  </div> */}
                   <p className="text-gray-700">
                     To leverage the in-depth insights provided by Samanta Business Analysis, a fee is required. 
                     You will receive a detailed invoice and a secure payment link directly to your email, 
@@ -159,7 +188,6 @@ function EmailPage() {
                     className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center"
                     onClick={handlePrice}
                   >
-                    {/* <DollarSign size={16} className="mr-1" /> */}
                     Price
                   </button>
                   <button 
