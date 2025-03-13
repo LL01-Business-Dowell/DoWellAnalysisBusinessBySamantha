@@ -56,7 +56,7 @@ function EmailPage() {
 
     } catch (error) {
       console.log("Error in checking user.", error);
-      toast.error("Error, Please try again.")
+      toast.error(error.response.data.message)
     } finally {
       setIsLoading(false)
     }
@@ -109,15 +109,9 @@ function EmailPage() {
         />
         {isEligible === null && 
           <div className="relative flex items-center">
-            <button 
-              className='flex items-center justify-center bg-green-500 w-full p-2 rounded-2xl text-white font-semibold'
-              onClick={checkUser}
-            >
-              Start {isLoading && <Loader2 className='ml-2 animate-spin'/>}
-            </button>
-            <div className="relative ml-2">
+            <div className="relative mr-2">
               <button 
-                className='flex items-center justify-center bg-green-500 p-2 rounded-full text-white'
+                className='flex items-center justify-center bg-yellow-400 p-1 rounded-full text-white'
                 onClick={openHelpVideo}
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
@@ -130,6 +124,12 @@ function EmailPage() {
                 </div>
               )}
             </div>
+            <button 
+              className='flex items-center justify-center bg-green-500 w-full p-2 rounded-2xl text-white font-semibold'
+              onClick={checkUser}
+            >
+              Start {isLoading && <Loader2 className='ml-2 animate-spin'/>}
+            </button>
           </div>
         }
         
@@ -203,7 +203,7 @@ function EmailPage() {
           </div>
         }
         
-        <p onClick= {handleWebsite} className='text-gray-500 text-sm mt-5'>DoWell UX Living Lab</p>
+        <p onClick= {handleWebsite} className='text-gray-500 text-sm mt-5 cursor-pointer'>DoWell UX Living Lab</p>
     </div>
   )
 }
