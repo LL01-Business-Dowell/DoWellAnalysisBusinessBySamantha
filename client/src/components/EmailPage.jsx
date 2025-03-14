@@ -204,6 +204,12 @@ function EmailPage() {
         }
         
         <p onClick= {handleWebsite} className='text-gray-500 text-sm mt-5 cursor-pointer'>DoWell UX Living Lab</p>
+        <div className="flex justify-center items-center mt-5">
+  <img 
+    src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fsamantaanalysis.uxlivinglab.online%2F&countColor=%23263759&style=plastic" 
+    alt="Visitor Badge" 
+  />
+</div>
     </div>
   )
 }
