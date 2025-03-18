@@ -11,6 +11,7 @@ function LinkedInPage() {
   const emailPageEligible = useRecoilValue(emailPageEligibleAtom);
   const analysisPageEligible = useRecoilValue(analysisPageEligibleAtom);
   return (
+    
     <>
         <Toaster reverseOrder={false} />
         <div className='flex w-screen h-screen items-center justify-center'>
