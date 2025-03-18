@@ -234,17 +234,22 @@ function EmailPage() {
               
               {/* Content */}
               <div className="p-6">
-                <div className="flex items-start mb-4">
-                  <p className="text-gray-700">
+                <div className="flex flex-col items-center mb-4">
+                <p className="text-gray-700">
                     To leverage the in-depth insights provided by Samanta Business Analysis, a fee is required. 
                     You will receive a detailed invoice and a secure payment link directly to your email, 
-                    accompanied by your analysis report. Please select the 'Price' button to review our pricing structure. 
+                    accompanied by your analysis report. 
+                  </p>
+                  <p className="text-gray-700">
+                    Price for this report is <span className='text-red-900'>{price}</span>. 
+                  </p>
+                  <p className="text-gray-700">
                     Your agreement is required to continue.
                   </p>
                 </div>
                 
                 {/* Footer with gradient buttons */}
-                <div className="flex flex-col sm:flex-row gap-2 mt-6">
+                <div className="flex flex-col sm:flex-row gap-2 mt-6 justify-center">
                   <button 
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium transition-colors flex items-center justify-center"
                     onClick={handleCancel}
@@ -252,12 +257,12 @@ function EmailPage() {
                     <X size={16} className="mr-1" />
                     Cancel
                   </button>
-                  <button 
+                  {/* <button 
                     className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center"
                     onClick={handlePrice}
                   >
                     Price {price}
-                  </button>
+                  </button> */}
                   <button 
                     className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center"
                     onClick={handleAgree}
