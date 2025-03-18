@@ -1,6 +1,6 @@
 import LinkedInPage from "./pages/LinkedInPage";
 import MapPage from "./pages/MapPage";
-import { Route, Router, BrowserRouter, Routes } from "react-router-dom";
+import { Route, BrowserRouter, Routes } from "react-router-dom";
 import ReviewPage from "./pages/ReviewPage";
 
 function App() {
