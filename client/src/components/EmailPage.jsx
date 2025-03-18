@@ -6,6 +6,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom, userEmailAtom } from '../recoil/atom';
 import { Loader2, RotateCw, CheckCircle, X, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getCountryAndCurrencyData, getPPP, getUserInfo } from '../services/utils';
 
 function EmailPage() {
   const setUserEmail = useSetRecoilState(userEmailAtom);
@@ -17,6 +18,7 @@ function EmailPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [price,setPrice] = useState("");
 
   useEffect(() => {
     // Show tooltip for 3 seconds when component mounts
@@ -27,6 +29,53 @@ function EmailPage() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const checkUserCountryAndCurrency = async () => {
+    try {
+      // Get API data
+      const apiData = await getCountryAndCurrencyData();
+      
+      // Get user info from IP
+      const userInfo = await getUserInfo();
+      
+      // Check if user's country exists in the API data
+      const matchedCountry = apiData.countries.find(
+        (country) => country.toLowerCase() === userInfo.country.toLowerCase()
+      );
+      
+      // Check if user's currency exists in the API data
+      const matchedCurrency = apiData.currencies.find((currency) => {
+        return (
+          currency.toLowerCase().includes(userInfo.currency.toLowerCase()) ||
+          (userInfo.currency_name &&
+            currency
+              .toLowerCase()
+              .includes(userInfo.currency_name.toLowerCase()))
+        );
+      });
+      
+      if (matchedCountry && matchedCurrency) {
+        return {
+          success: true, 
+          country: matchedCountry, 
+          currency: matchedCurrency
+        };
+      } else {
+        return {
+          success: false, 
+          country: null, 
+          currency: null
+        };
+      }
+    } catch (error) {
+      console.error("Error checking user data:", error);
+      return {
+        success: false,
+        country: null, 
+        currency: null
+      };
+    }
+  };
 
   async function checkUser() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,6 +99,25 @@ function EmailPage() {
         setUserEmail(email);
         // Show payment popup after email verification
         setShowPaymentPopup(true);
+        const userMatchData = await checkUserCountryAndCurrency();
+        console.log("User country and currency match data:", userMatchData);
+
+        if (userMatchData.success) {
+          try{
+            const res = await getPPP(
+              {
+                "base_currency": "British pound",
+                "base_price": "5",
+                "base_country": "United Kingdom",
+                "target_country": userMatchData.country,
+                "target_currency": userMatchData.currency
+              }
+            )
+            setPrice(res.calculated_price_base_on_ppp)
+          } catch(e){
+            setPrice("5 GBP")
+          }
+        }
       } else {
         setIsEligible(false)
       }
@@ -61,7 +129,7 @@ function EmailPage() {
       setIsLoading(false)
     }
   }
-
+  
   function handleContinue() {
     setEmailPageEligible(false)
     setMapPageEligible(true)
@@ -188,7 +256,7 @@ function EmailPage() {
                     className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center"
                     onClick={handlePrice}
                   >
-                    Price
+                    Price {price}
                   </button>
                   <button 
                     className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center"
@@ -206,7 +274,7 @@ function EmailPage() {
         <p onClick= {handleWebsite} className='text-gray-500 text-sm mt-5 cursor-pointer'>DoWell UX Living Lab</p>
         <div className="flex justify-center items-center mt-5">
   <img 
-    src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fsamantaanalysis.uxlivinglab.online%2F&countColor=%23263759&style=plastic" 
+    src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fsamantaanalysis.uxlivinglab.online%2F&labelColor=%2337d67a&countColor=%23d9e3f0&style=plastic" 
     alt="Visitor Badge" 
   />
 </div>
