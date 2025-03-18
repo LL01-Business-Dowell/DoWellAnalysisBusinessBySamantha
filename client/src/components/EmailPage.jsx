@@ -241,7 +241,7 @@ function EmailPage() {
                     accompanied by your analysis report. 
                   </p>
                   <p className="text-red-700 font-bold">
-                    Price for this report is {price}. 
+                    Price for this report is {price} 
                   </p>
                   <p className="text-gray-700">
                     Your agreement is required to continue.
@@ -263,13 +263,14 @@ function EmailPage() {
                   >
                     Price {price}
                   </button> */}
-                  <button 
-                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center"
-                    onClick={handleAgree}
-                  >
-                    <CheckCircle size={16} className="mr-1" />
-                    Agree & continue
-                  </button>
+                  <button
+                  className={`px-4 py-2 text-white rounded-lg font-medium transition-colors flex items-center justify-center ${price ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 cursor-not-allowed'}`}
+                  onClick={handleAgree}
+                  disabled={!price}
+                >
+                  <CheckCircle size={16} className="mr-1" />
+                  Agree & continue
+                </button>
                 </div>
               </div>
             </div>
