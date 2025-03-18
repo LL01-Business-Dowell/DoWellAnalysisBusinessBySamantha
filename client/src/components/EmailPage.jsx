@@ -240,8 +240,8 @@ function EmailPage() {
                     You will receive a detailed invoice and a secure payment link directly to your email, 
                     accompanied by your analysis report. 
                   </p>
-                  <p className="text-gray-700">
-                    Price for this report is <span className='text-red-900'>{price}</span>. 
+                  <p className="text-red-700 font-bold">
+                    Price for this report is {price}. 
                   </p>
                   <p className="text-gray-700">
                     Your agreement is required to continue.
