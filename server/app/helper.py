@@ -41,6 +41,17 @@ def experience_database_services(email, occurrences):
     return response.text
 
 
+def experience_database_services_linkedin(email, occurrences):
+    url = "https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=experienced_service_user_details"
+    payload = {
+        "email":email,
+        "product_number":"UXLIVINGLAB011",
+        "occurrences":occurrences
+    }
+    response = requests.post(url, json=payload)
+    return response.text
+
+
 def save_experienced_product_data(product_name,email,experienced_data):
     url = "https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=experienced_user_details"
     payload = {

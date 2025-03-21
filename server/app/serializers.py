@@ -17,3 +17,8 @@ class AnalysisSerializer(serializers.Serializer):
     website = serializers.URLField(allow_null=True, allow_blank=True, required=False)
     latitude = serializers.FloatField(allow_null=True, required=False)
     longitude = serializers.FloatField(allow_null=True, required=False)
+
+class LinkedinSerializer(serializers.Serializer):
+    email = serializers.EmailField(allow_null=False, allow_blank=False)
+    occurrences = serializers.IntegerField(allow_null=False)
+    linkedin_link = website = serializers.URLField(allow_null=False, allow_blank=False, required=True)
