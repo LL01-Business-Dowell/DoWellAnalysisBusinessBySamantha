@@ -29,8 +29,8 @@ curl -X POST "https://samantaanalysis.uxlivinglab.online/api/v1/business-analysi
 curl -X POST "https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=register_user" \
      -H "Content-Type: application/json" \
      -d '{
-           "product_number": "UXLIVINGLAB010",
-           "email": "workfloweric92@gmail.com"
+           "product_number": "UXLIVINGLAB011",
+           "email": "manish@dowellresearch.in"
          }'
 
 ###
@@ -45,3 +45,12 @@ curl -X POST "https://100085.pythonanywhere.com/api/email/" \
            "subject": "Your Email Subject",
            "email_content": "Hello, this is a test email message."
          }'
+
+###
+curl -X POST "http://127.0.0.1:8000/v1/business-analysis/?type=linkedin_analysis_report" \
+     -H "Content-Type: application/json" \
+     -d '{
+          "email": "manish@dowellresearch.in",
+          "occurrences": 1,
+          "linkedin_link":"https://www.linkedin.com/in/hiroyuki-sasaki-657b1319b/"
+     }'

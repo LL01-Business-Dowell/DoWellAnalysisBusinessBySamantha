@@ -244,6 +244,7 @@ class businessAnalysisBySamanta(APIView):
 
         occurrences += 1
 
+
         try:
             linkedin_text = new_gemini(
                 API_KEY,
@@ -255,13 +256,13 @@ class businessAnalysisBySamanta(APIView):
             if not linkedin_text:
                 return Response({
                     "success": False,
-                    "message": "Failed to retrieve SWOT analysis results"
+                    "message": "Failed to retrieve linkedin analysis results"
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             def save_experienced_data():
                 try:
                     save_experienced_product_data(
-                        "DOWELL LINKDIN ANALYSIS",
+                        "DOWELL LINKEDIN ANALYSIS",
                         email,
                         {
                             "email": email,

@@ -21,4 +21,4 @@ class AnalysisSerializer(serializers.Serializer):
 class LinkedinSerializer(serializers.Serializer):
     email = serializers.EmailField(allow_null=False, allow_blank=False)
     occurrences = serializers.IntegerField(allow_null=False)
-    linkedin_link = website = serializers.URLField(allow_null=False, allow_blank=False, required=True)
+    linkedin_link  = serializers.URLField(allow_null=False, allow_blank=False, required=True)
