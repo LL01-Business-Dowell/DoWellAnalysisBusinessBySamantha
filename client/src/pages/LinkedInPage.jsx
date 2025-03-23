@@ -127,7 +127,7 @@ async function checkUser() {
           const res = await getPPP(
             {
               "base_currency": "British pound",
-              "base_price": "5",
+              "base_price": "8",
               "base_country": "United Kingdom",
               "target_country": userMatchData.country,
               "target_currency": userMatchData.currency
