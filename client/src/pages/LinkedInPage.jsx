@@ -353,7 +353,7 @@ const handleEmail = async (data) => {
     <body>
       <div class="header">
         <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
-        <h1>LinkedIn Analysis from Samanta AI... Unlocking Valuable Insights</h1>
+        <h1>LinkedIn Profile Analysis from Samanta AI... Unlocking Valuable Insights</h1>
         <p class="date">Generated on ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
       </div>
       
@@ -615,7 +615,7 @@ return (
           <p onClick= {handleWebsite} className='text-gray-500 text-sm mt-5 cursor-pointer'>DoWell UX Living Lab</p>
           <div className="flex justify-center items-center mt-5">
     <img 
-      src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fsamantaanalysis.uxlivinglab.online%2F&labelColor=%2337d67a&countColor=%23d9e3f0&style=plastic" 
+      src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fsamantaanalysis.uxlivinglab.online%2Flinkedin&labelColor=%2337d67a&countColor=%23555555&style=plastic" 
       alt="Visitor Badge" 
     />
   </div>
