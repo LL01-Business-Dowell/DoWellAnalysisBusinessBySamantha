@@ -53,6 +53,6 @@ export async function sendEmailLinkedIn(data){
 }
 
 export async function linkedInAnalysis(body) {
-    const response = await axios.post(`${BACKEND_URL}/business-analysis/?type=linkedin_analysis_report`, body);
+    const response = await axios.post(`${BACKEND_URL}/v1/business-analysis/?type=linkedin_analysis_report`, body);
     return response.data;
 }

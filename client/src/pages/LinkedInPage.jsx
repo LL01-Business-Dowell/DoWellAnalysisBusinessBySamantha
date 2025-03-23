@@ -127,7 +127,7 @@ async function checkUser() {
           const res = await getPPP(
             {
               "base_currency": "British pound",
-              "base_price": "15",
+              "base_price": "5",
               "base_country": "United Kingdom",
               "target_country": userMatchData.country,
               "target_currency": userMatchData.currency
@@ -198,7 +198,7 @@ const handleEmail = async (data) => {
   <!DOCTYPE html>
   <html>
     <head>
-      <title>${analysisData[0]?.heading || 'Business Analysis'}</title>
+      <title>Linkedin Analysis</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>
         body {
@@ -353,7 +353,7 @@ const handleEmail = async (data) => {
     <body>
       <div class="header">
         <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
-        <h1>${analysisData[0]?.heading ? `Business analysis of ${analysisData[0].heading} from Samanta AI... analysing customer perspectives` : 'Business analysis from Samanta AI... analysing customer perspectives'}</h1>
+        <h1>LinkedIn Analysis from Samanta AI... Unlocking Valuable Insights</h1>
         <p class="date">Generated on ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
       </div>
       
@@ -408,11 +408,11 @@ const handleEmail = async (data) => {
     const emailData = {
       toname: email, 
       toemail: email, 
-      subject: '🚀 Business analysis from Samanta AI... analysing customer perspectives',
+      subject: '🚀 LinkedIn Analysis from Samanta AI... Unlocking Valuable Insights',
       email_content: htmlContent,
     };
 
-    const response = await sendEmailLinkedIn(emailData);
+    const response = await sendEmail(emailData);
     
 
     if (response.success) {
@@ -486,7 +486,7 @@ return (
           <img src={SamantaLogo} alt="Samanta Logo" />
           {!isAnalysing ? !isEmailed  &&
             <div>
-              <p>Samanta can travel anywhere in the world digitally and collect data for analysis</p>
+              <p>Samanta can analyze your LinkedIn profile and suggest improvements.</p>
               <input 
                 type="text"
                 className='w-full p-2 rounded-2xl border my-2'
@@ -503,7 +503,7 @@ return (
               />
             </div> : ""
           }
-          {!isEmailed ? isAnalysing ? <p className='text-red-500 text-sm text-center'>Analysing your business...{ <Loader2 size={12} className='animate-spin mx-auto'/>}</p> : "" : ""}
+          {!isEmailed ? isAnalysing ? <p className='text-red-500 text-sm text-center'>Analysing your linkedin...{ <Loader2 size={12} className='animate-spin mx-auto'/>}</p> : "" : ""}
 
           {isEmailed &&
             <div className='flex flex-col space-y-2 items-start'>
@@ -573,9 +573,7 @@ return (
                 <div className="p-6">
                   <div className="flex flex-col items-center mb-4">
                   <p className="text-gray-700">
-                      To leverage the in-depth insights provided by Samanta Business Analysis, a fee is required. 
-                      You will receive a detailed invoice and a secure payment link directly to your email, 
-                      accompanied by your analysis report. 
+                  To access the in-depth insights from Samanta LinkedIn Analysis, a fee is required. You’ll receive a detailed invoice and a secure payment link via email, along with your analysis report. 
                     </p>
                     <p className="text-red-700 font-bold">
                       Price for this report is {price} 
