@@ -497,7 +497,7 @@ return (
               <input 
                 type="text"
                 className='w-full p-2 rounded-2xl border my-2'
-                placeholder='Linked In Link'
+                placeholder='LinkedIn Link'
                 value={linkedInLink}
                 onChange={(e) => setLinkedInLink(e.target.value)}
               />
