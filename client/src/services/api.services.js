@@ -6,8 +6,11 @@ const DOWELL_BACKEND_URL = import.meta.env.VITE_DOWELL_BACKEND_URL;
 
 export async function getUser(email) {
     const response = await axios.get(`${DOWELL_BACKEND_URL}/experience_database_services/?type=get_user_email&product_number=UXLIVINGLAB010&email=${email}`)
-    console.log(response);
-    
+    return response.data;
+}
+
+export async function getUserLinkedIn(email) {
+    const response = await axios.get(`${DOWELL_BACKEND_URL}/experience_database_services/?type=get_user_email&product_number=UXLIVINGLAB011&email=${email}`)
     return response.data;
 }
 
@@ -18,6 +21,15 @@ export async function register(email) {
     });
     return response.data;
 }
+
+export async function registerLinkedIn(email) {
+    const response = await axios.post(`${DOWELL_BACKEND_URL}/experience_database_services/?type=register_user`, {
+        email: email,
+        product_number: "UXLIVINGLAB011"
+    });
+    return response.data;
+}
+
 
 export async function analysis(body) {
     const response = await axios.post(`${BACKEND_URL}/v1/business-analysis/?type=business_info`, body);
@@ -32,5 +44,15 @@ export async function sowtAnalysis(body) {
 
 export async function sendEmail(data){
     const response = await axios.post('https://100085.pythonanywhere.com/api/swot_email/', data);
+    return response.data;
+}
+
+export async function sendEmailLinkedIn(data){
+    const response = await axios.post('https://100085.pythonanywhere.com/api/email/', data);
+    return response.data;
+}
+
+export async function linkedInAnalysis(body) {
+    const response = await axios.post(`${BACKEND_URL}/business-analysis/?type=linkedin_analysis_report`, body);
     return response.data;
 }
