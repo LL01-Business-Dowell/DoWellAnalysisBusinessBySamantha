@@ -193,7 +193,7 @@ const handleEmail = async (data) => {
   
   const feedbackBaseUrl = "https://www.scales.uxlivinglab.online/api/v1/create-response/?user=True&scale_type=nps&channel=channel_1&instance=instance_1&workspace_id=6385c0e48eca0fb652c9447b&username=HeenaK&scale_id=665d95ae7ee426d671222a7b&item=";
   
-  const productUrl = "https://samantaanalysis.uxlivinglab.online/"
+  const productUrl = "https://samantaanalysis.uxlivinglab.online/linkedin"
   const htmlContent = `
   <!DOCTYPE html>
   <html>
@@ -368,7 +368,7 @@ const handleEmail = async (data) => {
 
       <!-- Product Button Section -->
       <div class="product-button-container">
-        <a href="${productUrl}" class="product-button">Try Samanta AI for Your Business</a>
+        <a href="${productUrl}" class="product-button">Try Samanta AI for Your Linkedin Profile</a>
       </div>
       
       <!-- Feedback Rating Section -->
