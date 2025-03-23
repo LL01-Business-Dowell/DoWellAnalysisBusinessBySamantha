@@ -521,7 +521,7 @@ return (
 
           {isEligible === null && 
             <div className="relative flex items-center">
-              <div className="relative mr-2">
+              {/* <div className="relative mr-2">
                 <button 
                   className='flex items-center justify-center bg-yellow-400 p-1 rounded-full text-white'
                   onClick={openHelpVideo}
@@ -535,7 +535,7 @@ return (
                     Help video
                   </div>
                 )}
-              </div>
+              </div> */}
               <button 
                 className='flex items-center justify-center bg-green-500 w-full p-2 rounded-2xl text-white font-semibold'
                 onClick={checkUser}
