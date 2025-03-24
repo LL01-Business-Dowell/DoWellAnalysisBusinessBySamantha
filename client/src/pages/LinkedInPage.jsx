@@ -168,7 +168,7 @@ const formatResponse = (data) => {
   
   // Process each line to extract sections properly
   lines.forEach(line => {
-    if (line.startsWith('**') && line.endsWith(':**')) {
+    if (line.startsWith('**') && line.includes(':**')) {
       // This is a section header like "**Strengths:**"
       currentSection = line.replace(/\*\*/g, '').replace(':', '');
       sections.push({ heading: currentSection, content: [] });
@@ -185,11 +185,11 @@ const formatResponse = (data) => {
 };
 
 const handleEmail = async (data) => {
+  
   const analysisData = formatResponse(data);
   setIsResendDisabled(true);
   setCountdown(60);
   setIsEmailed(true);
-  console.log(analysisData, "data");
   
   const feedbackBaseUrl = "https://www.scales.uxlivinglab.online/api/v1/create-response/?user=True&scale_type=nps&channel=channel_1&instance=instance_1&workspace_id=6385c0e48eca0fb652c9447b&username=HeenaK&scale_id=665d95ae7ee426d671222a7b&item=";
   
@@ -212,6 +212,10 @@ const handleEmail = async (data) => {
         .header {
           text-align: center;
           margin-bottom: 30px;
+        }
+        .header>a {
+          color: black;
+          text-decoration: none;
         }
         .logo {
           max-width: 150px;
@@ -317,7 +321,11 @@ const handleEmail = async (data) => {
           border-left: 4px solid #c53030;
           padding-left: 15px;
         }
-          .product-button-container {
+        .overall-grade {
+          border-left: none;
+          text-align: center;
+        }
+        .product-button-container {
           text-align: center;
           margin: 30px auto;
         }
@@ -355,11 +363,12 @@ const handleEmail = async (data) => {
         <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
         <h1>LinkedIn Profile Analysis from Samanta AI... Unlocking Valuable Insights</h1>
         <p class="date">Generated on ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+        <a href="${linkedInLink}">${linkedInLink}</a>
       </div>
       
       ${analysisData.slice(1).map(section => `
-        <div class="swot-section">
-          <h2>${section.heading}</h2>
+        <div class="swot-section ${section.heading.includes('Overall Grade') ? 'overall-grade' : ''}">
+          <h3>${section.heading}</h3>
           <ul>
             ${section.content.map(item => `<li>${item}</li>`).join('')}
           </ul>
@@ -455,7 +464,10 @@ async function handleAgree() {
         }
         const response = await linkedInAnalysis(body);
         handleEmail(response.response);
+        console.log(response.response, "respo");
+        
         setAnalysisData(response.response);
+        
         
       } catch (error) {
         toast.error("Please try again later.")

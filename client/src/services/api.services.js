@@ -43,7 +43,7 @@ export async function sowtAnalysis(body) {
 }
 
 export async function sendEmail(data){
-    const response = await axios.post('https://100085.pythonanywhere.com/api/swot_email/', data);
+    const response = await axios.post('https://100085.pythonanywhere.com/api/email/', data);
     return response.data;
 }
 
