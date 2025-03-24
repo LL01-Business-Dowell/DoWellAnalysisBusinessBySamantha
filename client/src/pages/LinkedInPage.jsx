@@ -502,16 +502,16 @@ return (
               <input 
                 type="text"
                 className='w-full p-2 rounded-2xl border my-2'
-                placeholder='Email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder='LinkedIn Link'
+                value={linkedInLink}
+                onChange={(e) => setLinkedInLink(e.target.value)}
               />
               <input 
                 type="text"
                 className='w-full p-2 rounded-2xl border my-2'
-                placeholder='LinkedIn Link'
-                value={linkedInLink}
-                onChange={(e) => setLinkedInLink(e.target.value)}
+                placeholder='Email'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div> : ""
           }
