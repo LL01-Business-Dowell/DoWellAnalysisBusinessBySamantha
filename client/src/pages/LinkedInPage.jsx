@@ -92,7 +92,7 @@ const checkUserCountryAndCurrency = async () => {
 
 async function checkUser() {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const linkedInRegex = /^https?:\/\/(www\.)?linkedin\.com\/(in|company|school)\/[a-zA-Z0-9-_%]+\/?$/;
+  const linkedInRegex = /^https?:\/\/(www\.)?linkedin\.com\/(in|company|school)\/[a-zA-Z0-9-_%]+\/?(\?.*)?$/;;
 
   if (!emailRegex.test(email)) {
     toast.error("Email is invalid.");
@@ -561,7 +561,7 @@ return (
             <div>
               {occurence !== undefined && occurence !== null && occurence !== 0 && 
                 <div className="mb-2">
-                  You have {occurence} occurrences.
+                  you have processed {occurence} reports.
                 </div>
               }
               {!isEligible && 
