@@ -430,6 +430,10 @@ function LinkedInPage() {
       <div class="product-button-container">
         <a href="${productUrl}" class="product-button">Try Samanta AI for Your Linkedin Profile</a>
       </div>
+
+      <div style="text-align: center; margin: 20px 0; font-weight: bold; color: #1a365d;">
+        Price for this report: <span style="color: #c53030;">${price}</span>
+      </div>
       
       <!-- Feedback Rating Section -->
       <div class="feedback-section">
