@@ -19,6 +19,8 @@ import {
   getUserInfo,
 } from "../services/utils";
 import Datacubeservices from "../services/database.service";
+import axios from "axios";
+
 
 function LinkedInPage() {
   const setUserEmail = useSetRecoilState(userEmailAtom);
@@ -36,6 +38,7 @@ function LinkedInPage() {
   const [isAnalysing, setIsAnalysing] = useState(false);
   const [analysisData, setAnalysisData] = useState(null);
   const [isDataInserting, setIsDataInserting] = useState(false);
+  const [paymentLink, setPaymentLink] = useState('');
 
   useEffect(() => {
     setShowTooltip(true);
@@ -133,6 +136,40 @@ function LinkedInPage() {
     }
   };
 
+  const initializeStripePayment = async () => {
+    try {
+      const userMatchData = await checkUserCountryAndCurrency();
+      const userInfo = await getUserInfo();
+      
+      const paymentData = {
+        callback_url: "https://dowellpay.online/thank-you",
+        currency_code: userInfo.currency || "INR", // Fallback to INR if no currency found
+        description: "Payment link for linkedin analyzer",
+        price: Math.round(parseFloat(price.replace(/[^\d.]/g, '')) * 100),
+        product: "Samanta Linkedin Analyzer",
+        timezone: userInfo.timeZone || "Asia/Kolkata"
+      };
+
+      const response = await axios.post(
+        "https://100088.pythonanywhere.com/api/stripe/initialize", 
+        paymentData
+      );
+
+      if (response.data.success) {
+        setPaymentLink(response.data.approval_url);
+        return response.data;
+      } else {
+        toast.error("Failed to initialize payment");
+        return null;
+      }
+    } catch (error) {
+      console.error("Payment initialization error:", error);
+      toast.error("Error initializing payment");
+      return null;
+    }
+  };
+
+
   async function checkUser() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const linkedInRegex =/^(https?:\/\/)?(www\.)?linkedin\.com\/(in|company|school)\/[a-zA-Z0-9-_%]+\/?(\?.*)?$/;
@@ -224,7 +261,7 @@ function LinkedInPage() {
     return sections;
   };
 
-  const handleEmail = async (data) => {
+  const handleEmail = async (data,paymentData) => {
     const analysisData = formatResponse(data);
     setIsResendDisabled(true);
     setCountdown(60);
@@ -433,7 +470,10 @@ function LinkedInPage() {
 
       <div style="text-align: center; margin: 20px 0; font-weight: bold; color: #1a365d;">
         Price for this report: <span style="color: #c53030;">${price}</span>
+        <br>
+        <a href="${paymentData.approval_url}" style="color: #00C950; text-decoration: underline;">Click here to Complete Payment</a>
       </div>
+
       
       <!-- Feedback Rating Section -->
       <div class="feedback-section">
@@ -562,6 +602,11 @@ function LinkedInPage() {
     // Only proceed if data insertion is successful
     if (isDataInserted) {
       try {
+        const paymentInitResponse = await initializeStripePayment();
+        if (!paymentInitResponse) {
+          toast.error("Payment initialization failed");
+          return;
+        }
         setShowPaymentPopup(false);
         setIsAnalysing(true);
         try {
@@ -571,7 +616,7 @@ function LinkedInPage() {
             linkedin_link: linkedInLink,
           };
           const response = await linkedInAnalysis(body);
-          handleEmail(response.response);
+          handleEmail(response.response,paymentInitResponse);
           console.log(response.response, "respo");
 
           setAnalysisData(response.response);

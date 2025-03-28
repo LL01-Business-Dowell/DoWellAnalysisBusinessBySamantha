@@ -21,6 +21,7 @@ export const getUserInfo = async () => {
       country: response.data.country_name,
       currency: response.data.currency,
       currency_name: response.data.currency_name,
+      timeZone: response.data.timezone
     };
   } catch (error) {
     console.error("Error fetching user location:", error);
