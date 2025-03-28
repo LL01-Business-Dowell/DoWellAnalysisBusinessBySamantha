@@ -145,7 +145,7 @@ function LinkedInPage() {
         callback_url: "https://dowellpay.online/thank-you",
         currency_code: userInfo.currency || "INR", // Fallback to INR if no currency found
         description: "Payment link for linkedin analyzer",
-        price: Math.round(parseFloat(price.replace(/[^\d.]/g, '')) * 100),
+        price: parseFloat(price.replace(/[^\d.]/g, '')),
         product: "Samanta Linkedin Analyzer",
         timezone: userInfo.timeZone || "Asia/Kolkata"
       };
@@ -211,7 +211,9 @@ function LinkedInPage() {
               target_country: userMatchData.country,
               target_currency: userMatchData.currency,
             });
+            
             setPrice(res.calculated_price_base_on_ppp);
+            
           } catch (e) {
             setPrice("5 GBP");
           }
@@ -420,7 +422,41 @@ function LinkedInPage() {
           
         .product-button:hover {
           background-color: #00C950;
-    }
+        }
+        .payment-section {
+          background-color: #f0f4f8;
+          border: 2px solid #00C950;
+          border-radius: 10px;
+          padding: 20px;
+          margin: 20px 0;
+          text-align: center;
+        }
+        .payment-price {
+          font-size: 24px;
+          color: #c53030;
+          font-weight: bold;
+          margin-bottom: 15px;
+        }
+        .payment-link {
+          display: block;
+          background-color: #00C950;
+          color: white;
+          text-decoration: none;
+          padding: 15px 25px;
+          border-radius: 8px;
+          font-weight: bold;
+          font-size: 18px;
+          margin-top: 15px;
+          transition: background-color 0.3s ease;
+        }
+        .payment-link:hover {
+          background-color: #009c40;
+        }
+        .product-link {
+          color: #1a365d;
+          text-decoration: underline;
+          font-weight: bold;
+        }
         @media only screen and (max-width: 600px) {
           .rating-button {
             width: 35px;
@@ -464,14 +500,11 @@ function LinkedInPage() {
         .join("")}
 
       <!-- Product Button Section -->
-      <div class="product-button-container">
-        <a href="${productUrl}" class="product-button">Try Samanta AI for Your Linkedin Profile</a>
-      </div>
 
-      <div style="text-align: center; margin: 20px 0; font-weight: bold; color: #1a365d;">
-        Price for this report: <span style="color: #c53030;">${price}</span>
-        <br>
-        <a href="${paymentData.approval_url}" style="color: #00C950; text-decoration: underline;">Click here to Complete Payment</a>
+      <div class="payment-section">
+        <div class="payment-price">Price for this report: ${price}</div>
+        <a href="${paymentData.approval_url}" class="payment-link">Complete Payment Now</a>
+        <p>Interested in more? <a href="${productUrl}" class="product-link">Try Samanta AI...</a></p>
       </div>
 
       
