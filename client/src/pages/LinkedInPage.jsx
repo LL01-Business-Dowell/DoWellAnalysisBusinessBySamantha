@@ -684,21 +684,21 @@ function LinkedInPage() {
           {!isAnalysing
             ? !isEmailed && (
                 <div>
-                  <p>
+                  <p className="my-1">
                     Samanta can analyze your LinkedIn profile and suggest
                     improvements.
                   </p>
                   <input
                     type="text"
                     className="w-full p-2 rounded-2xl border my-2"
-                    placeholder="LinkedIn Link"
+                    placeholder="Your personal Linkedin profile link"
                     value={linkedInLink}
                     onChange={(e) => setLinkedInLink(e.target.value)}
                   />
                   <input
                     type="text"
                     className="w-full p-2 rounded-2xl border my-2"
-                    placeholder="Email"
+                    placeholder="Your email to receive report"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -844,11 +844,11 @@ function LinkedInPage() {
 
           <p
             onClick={handleWebsite}
-            className="text-gray-500 text-sm mt-5 cursor-pointer"
+            className="text-gray-500 text-sm mt-3 cursor-pointer"
           >
             DoWell UX Living Lab
           </p>
-          <div className="flex justify-center items-center mt-5">
+          <div className="flex justify-center items-center mt-3">
             <img
               src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fsamantaanalysis.uxlivinglab.online%2Flinkedin&labelColor=%2337d67a&countColor=%23555555&style=plastic"
               alt="Visitor Badge"
