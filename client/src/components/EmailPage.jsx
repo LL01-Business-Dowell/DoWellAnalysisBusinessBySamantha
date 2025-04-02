@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react'
 import SamantaLogo from "../assets/samanta.svg"
 import { getUser, register } from '../services/api.services';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom, userEmailAtom } from '../recoil/atom';
+import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom, priceAtom, stripePaymentDataAtom, userEmailAtom } from '../recoil/atom';
 import { Loader2, RotateCw, CheckCircle, X, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getCountryAndCurrencyData, getPPP, getUserInfo } from '../services/utils';
+import axios from 'axios';
 
 function EmailPage() {
   const setUserEmail = useSetRecoilState(userEmailAtom);
@@ -18,7 +19,8 @@ function EmailPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [price,setPrice] = useState("");
+  const [price,setPrice] = useRecoilState(priceAtom);
+  const [paymentLink, setPaymentLink] = useRecoilState(stripePaymentDataAtom);
 
   useEffect(() => {
     // Show tooltip for 3 seconds when component mounts
@@ -74,6 +76,39 @@ function EmailPage() {
         country: null, 
         currency: null
       };
+    }
+  };
+
+  const initializeStripePayment = async () => {
+    try {
+      // const userMatchData = await checkUserCountryAndCurrency();
+      const userInfo = await getUserInfo();
+      
+      const paymentData = {
+        callback_url: "https://dowellpay.online/thank-you",
+        currency_code: userInfo.currency || "INR", // Fallback to INR if no currency found
+        description: "Payment link for linkedin analyzer",
+        price: parseFloat(price.replace(/[^\d.]/g, '')),
+        product: "Samanta Linkedin Analyzer",
+        timezone: userInfo.timeZone || "Asia/Kolkata"
+      };
+
+      const response = await axios.post(
+        "https://100088.pythonanywhere.com/api/stripe/initialize", 
+        paymentData
+      );
+
+      if (response.data.success) {
+        setPaymentLink(response.data.approval_url);
+        return response.data;
+      } else {
+        toast.error("Failed to initialize payment");
+        return null;
+      }
+    } catch (error) {
+      console.error("Payment initialization error:", error);
+      toast.error("Error initializing payment");
+      return null;
     }
   };
 
@@ -150,9 +185,16 @@ function EmailPage() {
     window.open("https://samanta.uk/", "_blank");
   }
 
-  function handleAgree() {
-    setShowPaymentPopup(false);
-    handleContinue();
+  async function handleAgree() {
+    const paymentInitResponse = await initializeStripePayment();
+        if (!paymentInitResponse) {
+          toast.error("Payment initialization failed");
+
+        } else {
+          setShowPaymentPopup(false);
+          handleContinue();
+        }
+    
   }
 
   function openHelpVideo() {

@@ -17,6 +17,7 @@ function LinkedInAnalysing() {
     const [swotAnalysisData, setSwotAnalysisData] = useState("");
     const [isResendDisabled, setIsResendDisabled] = useState(false);
     const [countdown, setCountdown] = useState(0);
+    
 
     const formatResponse = () => {
       if (!swotAnalysisData) return [];

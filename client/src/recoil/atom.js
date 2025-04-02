@@ -37,3 +37,13 @@ export const analysisPageEligibleAtom = atom({
     key: 'analysisPageEligible',
     default: false
 })
+
+export const priceAtom = atom({
+    key: 'price',
+    default: ""
+})
+
+export const stripePaymentDataAtom = atom({
+    key: 'paymentLink',
+    default: ""
+})

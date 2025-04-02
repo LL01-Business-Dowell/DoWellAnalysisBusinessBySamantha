@@ -4,9 +4,10 @@ import SamantaLogo from "../assets/samanta.svg";
 import DowellLogo from "../assets/dowell.png"
 import { analysis, sendEmail, sowtAnalysis } from '../services/api.services'
 import { useRecoilValue } from 'recoil'
-import { analysisDataAtom, occurenceAtom, userEmailAtom } from '../recoil/atom'
+import { analysisDataAtom, occurenceAtom, priceAtom, stripePaymentDataAtom, userEmailAtom } from '../recoil/atom'
 import { Loader2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+
 
 function AnalysingPage() {
     const occurrences = useRecoilValue(occurenceAtom);
@@ -18,6 +19,9 @@ function AnalysingPage() {
     const [swotAnalysisData, setSwotAnalysisData] = useState("");
     const [isResendDisabled, setIsResendDisabled] = useState(false);
     const [countdown, setCountdown] = useState(0);
+    const price = useRecoilValue(priceAtom)
+    const paymentLink = useRecoilValue(stripePaymentDataAtom)
+
 
     const formatResponse = () => {
       if (!swotAnalysisData) return [];
@@ -191,19 +195,53 @@ function AnalysingPage() {
               margin: 30px auto;
             }
             .product-button {
-              display: inline-block;
-              background-color: #00C950;
-              color: white;
-              font-weight: bold;
-              padding: 12px 24px;
-              border-radius: 6px;
-              text-decoration: none;
-              font-size: 16px;
-              transition: background-color 0.3s;
-            }
-              
-            .product-button:hover {
-              background-color: #00C950;
+          display: inline-block;
+          background-color: #00C950;
+          color: white;
+          font-weight: bold;
+          padding: 12px 24px;
+          border-radius: 6px;
+          text-decoration: none;
+          font-size: 16px;
+          transition: background-color 0.3s;
+        }
+          
+        .product-button:hover {
+          background-color: #00C950;
+        }
+        .payment-section {
+          background-color: #f0f4f8;
+          border: 2px solid #00C950;
+          border-radius: 10px;
+          padding: 20px;
+          margin: 20px 0;
+          text-align: center;
+        }
+        .payment-price {
+          font-size: 24px;
+          color: #c53030;
+          font-weight: bold;
+          margin-bottom: 15px;
+        }
+        .payment-link {
+          display: block;
+          background-color: #00C950;
+          color: white;
+          text-decoration: none;
+          padding: 15px 25px;
+          border-radius: 8px;
+          font-weight: bold;
+          font-size: 18px;
+          margin-top: 15px;
+          transition: background-color 0.3s ease;
+        }
+        .payment-link:hover {
+          background-color: #009c40;
+        }
+        .product-link {
+          color: #1a365d;
+          text-decoration: underline;
+          font-weight: bold;
         }
             @media only screen and (max-width: 600px) {
               .rating-button {
@@ -236,8 +274,10 @@ function AnalysingPage() {
           `).join('')}
 
           <!-- Product Button Section -->
-          <div class="product-button-container">
-            <a href="${productUrl}" class="product-button">Try Samanta AI for Your Business</a>
+          <div class="payment-section">
+            <div class="payment-price">Price for this report: ${price}</div>
+            <a href="${paymentLink}" class="payment-link">Complete Payment Now</a>
+            <p>Interested in more? <a href="${productUrl}" class="product-link">Try Samanta AI... for Your Business</a></p>
           </div>
           
           <!-- Feedback Rating Section -->
