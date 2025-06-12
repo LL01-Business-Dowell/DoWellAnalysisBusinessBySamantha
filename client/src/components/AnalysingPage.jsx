@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import MapComponent from './MapComponent'
 import SamantaLogo from "../assets/samanta.svg";
 import DowellLogo from "../assets/dowell.png"
-import { analysis, sendEmail, sowtAnalysis } from '../services/api.services'
+import { analysis, googleAnalysis, sendEmail, sowtAnalysis } from '../services/api.services'
 import { useRecoilValue } from 'recoil'
 import { analysisDataAtom, occurenceAtom, priceAtom, stripePaymentDataAtom, userEmailAtom } from '../recoil/atom'
 import { Loader2, X } from 'lucide-react';
@@ -24,38 +24,106 @@ function AnalysingPage() {
 
 
     const formatResponse = () => {
+
       if (!swotAnalysisData) return [];
-      
-      // Split by section headers (Strengths, Weaknesses, etc.)
-      const sections = [];
-      let currentSection = null;
-      let title = '';
-      
-      // First, extract the title from the first lines
-      const lines = swotAnalysisData.split('\n');
-      if (lines[0].startsWith('## ')) {
-        title = lines[0].replace('## ', '').replace('SWOT Analysis of ', '');
-        lines.shift(); // Remove the title line
+      const path = window.location.pathname;
+      if( path === "") {
+          // Split by section headers (Strengths, Weaknesses, etc.)
+        const sections = [];
+        let currentSection = null;
+        let title = '';
+        
+        // First, extract the title from the first lines
+        const lines = swotAnalysisData.split('\n');
+        if (lines[0].startsWith('## ')) {
+          title = lines[0].replace('## ', '').replace('SWOT Analysis of ', '');
+          lines.shift(); // Remove the title line
+        }
+        
+        sections.push({ heading: title, content: [] });
+        
+        // Process each line to extract sections properly
+        lines.forEach(line => {
+          if (line.startsWith('**') && line.endsWith(':**')) {
+            // This is a section header like "**Strengths:**"
+            currentSection = line.replace(/\*\*/g, '').replace(':', '');
+            sections.push({ heading: currentSection, content: [] });
+          } else if (line.trim().startsWith('* ') && currentSection) {
+            // This is a bullet point under a section
+            const bulletPoint = line.trim().replace('* ', '').replace(/\*\*/g, '');
+            if (bulletPoint.trim().length > 0) {
+              sections[sections.length - 1].content.push(bulletPoint);
+            }
+          }
+        });
+        
+        return sections;
+
+      } else if (path === "/google") {
+          const sections = [];
+          let currentSection = null;
+          let title = '';
+          
+          // Split content into lines for processing
+          const lines = swotAnalysisData.split('\n');
+          
+          // Process each line to extract sections
+          lines.forEach(line => {
+            const trimmedLine = line.trim();
+            
+            // Extract main title (### **SWOT Analysis of....**)
+            if (trimmedLine.startsWith('### **') && trimmedLine.includes('SWOT Analysis')) {
+              title = trimmedLine
+                .replace('### **', '')
+                .replace('**', '')
+                .replace('SWOT Analysis of ', '')
+                .replace(' Based on Google Reviews', '');
+              sections.push({ heading: title, content: [] });
+            }
+            // Handle section headers (#### **Strengths**, #### **Weaknesses**, etc.)
+            else if (trimmedLine.startsWith('#### **') && trimmedLine.endsWith('**')) {
+              currentSection = trimmedLine.replace('#### **', '').replace('**', '');
+              sections.push({ heading: currentSection, content: [] });
+            }
+            // Handle numbered list items (1. **Item Name**: Description)
+            else if (/^\d+\.\s\*\*/.test(trimmedLine) && currentSection) {
+              // Extract the numbered item
+              const item = trimmedLine
+                .replace(/^\d+\.\s/, '') // Remove number and dot
+                .replace(/\*\*/g, ''); // Remove bold formatting
+              
+              if (item.trim().length > 0) {
+                sections[sections.length - 1].content.push(item);
+              }
+            }
+            // Handle section headers for other parts (### **Detailed Insights**, ### **Conclusion**)
+            else if (trimmedLine.startsWith('### **') && !trimmedLine.includes('SWOT Analysis')) {
+              currentSection = trimmedLine.replace('### **', '').replace('**', '');
+              sections.push({ heading: currentSection, content: [] });
+            }
+            // Handle numbered items in other sections
+            else if (/^\d+\.\s\*\*/.test(trimmedLine) && (currentSection === 'Detailed Insights and Recommendations')) {
+              const item = trimmedLine
+                .replace(/^\d+\.\s/, '')
+                .replace(/\*\*/g, '');
+              
+              if (item.trim().length > 0) {
+                sections[sections.length - 1].content.push(item);
+              }
+            }
+            // Handle conclusion content (paragraph text)
+            else if (currentSection === 'Conclusion' && trimmedLine.length > 0 && !trimmedLine.startsWith('---')) {
+              // For conclusion, we'll treat each sentence as a content item
+              if (trimmedLine.trim().length > 0) {
+                sections[sections.length - 1].content.push(trimmedLine);
+              }
+            }
+          });
+          
+          return sections;
       }
       
-      sections.push({ heading: title, content: [] });
       
-      // Process each line to extract sections properly
-      lines.forEach(line => {
-        if (line.startsWith('**') && line.endsWith(':**')) {
-          // This is a section header like "**Strengths:**"
-          currentSection = line.replace(/\*\*/g, '').replace(':', '');
-          sections.push({ heading: currentSection, content: [] });
-        } else if (line.trim().startsWith('* ') && currentSection) {
-          // This is a bullet point under a section
-          const bulletPoint = line.trim().replace('* ', '').replace(/\*\*/g, '');
-          if (bulletPoint.trim().length > 0) {
-            sections[sections.length - 1].content.push(bulletPoint);
-          }
-        }
-      });
-      
-      return sections;
     };
     
     const handleEmail = async () => {
@@ -339,13 +407,26 @@ function AnalysingPage() {
             try {
 
                 setIsAnalysing(true)
-                const swotResponse = await sowtAnalysis({
-                  ...analysisData,
-                  email: userEmail,
-                  rating: parseInt(analysisData.rating, 10),
-                  reviews: parseInt(analysisData.reviews.match(/\d+/)[0], 10),
-                  occurrences: occurrences
-                })
+                let swotResponse = null;
+                const path = window.location.pathname;
+                if( path === "") {
+                  swotResponse = await sowtAnalysis({
+                    ...analysisData,
+                    email: userEmail,
+                    rating: parseInt(analysisData.rating, 10),
+                    reviews: parseInt(analysisData.reviews.match(/\d+/)[0], 10),
+                    occurrences: occurrences
+                  })
+          
+                } else if (path === "/google") {
+                  swotResponse = await googleAnalysis({
+                    ...analysisData,
+                    email: userEmail,
+                    rating: parseInt(analysisData.rating, 10),
+                    reviews: parseInt(analysisData.reviews.match(/\d+/)[0], 10),
+                    occurrences: occurrences
+                  })
+                }
                 setSwotAnalysisData(swotResponse.response)
                 setIsAnalysisComplete(true)
                 setIsAnalysing(false)

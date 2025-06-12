@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect } from 'react'
 import SamantaLogo from "../assets/samanta.svg"
-import { getUser, register } from '../services/api.services';
+import { getUser, getUserGoogle, register, registerGoogle } from '../services/api.services';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { emailPageEligibleAtom, mapPageEligibleAtom, occurenceAtom, priceAtom, stripePaymentDataAtom, userEmailAtom } from '../recoil/atom';
 import { Loader2, RotateCw, CheckCircle, X, Info } from 'lucide-react';
@@ -121,11 +121,23 @@ function EmailPage() {
 
     try {
       setIsLoading(true)
-      let response = await getUser(email)
-      console.log(response);
+      let response = null;
+      const path = window.location.pathname;
+      if( path === "") {
+        response = await getUser(email)
+
+      } else if (path === "/google") {
+        response = await getUserGoogle(email)
+      }
       
       if(response.occurrences == 0) {
-        await register(email)
+        if( path === "") {
+          await register(email)
+
+        } else if (path === "/google") {
+            await registerGoogle(email)
+        }
+        
       }
 
       if (response.occurrences <= 5) {
