@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from .serializers import *
 import datetime
 from threading import Thread
+from .help import *
 load_dotenv()
 
 API_KEY = str(os.getenv("API_KEY"))
