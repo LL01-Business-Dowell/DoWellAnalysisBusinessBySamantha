@@ -13,29 +13,32 @@ RUN apt-get update --fix-missing && \
     libx11-xcb1 libxcursor1 libxi6 libxrender1 libdbus-glib-1-2 libgtk-3-0 && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Google Chrome
-RUN apt-get update --fix-missing && apt-get install -f -y && \
-    wget -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y /tmp/chrome.deb && rm /tmp/chrome.deb
+# Get latest stable Chrome version and install matching Chrome + ChromeDriver
+RUN set -eux; \
+    # Get the latest stable version
+    CHROME_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" | \
+    python3 -c "import sys, json; print(json.load(sys.stdin)['channels']['Stable']['version'])"); \
+    echo "Using Chrome version: ${CHROME_VERSION}"; \
+    \
+    # Download and install Chrome
+    wget -O /tmp/chrome-linux64.zip "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip"; \
+    unzip /tmp/chrome-linux64.zip -d /opt/; \
+    ln -s /opt/chrome-linux64/chrome /usr/local/bin/chrome; \
+    \
+    # Download and install matching ChromeDriver
+    wget -O /tmp/chromedriver-linux64.zip "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip"; \
+    unzip /tmp/chromedriver-linux64.zip -d /opt/; \
+    ln -s /opt/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver; \
+    \
+    # Cleanup
+    rm /tmp/chrome-linux64.zip /tmp/chromedriver-linux64.zip; \
+    \
+    # Make executables
+    chmod +x /usr/local/bin/chrome /usr/local/bin/chromedriver
 
-# Set Chrome binary path for Selenium
-ENV GOOGLE_CHROME_BIN=/usr/bin/google-chrome
-
-# Install Chromedriver
-# Install Chromedriver using LATEST_RELEASE
-# Install Chromedriver using LATEST_RELEASE_STABLE (Corrected URL)
-RUN set -eux; CHROME_DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"); \
-    echo "ChromeDriver LATEST_RELEASE Version: ${CHROME_DRIVER_VERSION}"; \ 
-    wget -O /tmp/chromedriver.zip "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.53/linux64/chromedriver-linux64.zip"; \
-    if [ ! -s /tmp/chromedriver.zip ]; then \ 
-    echo "ERROR: ChromeDriver zip file download failed or resulted in empty file!"; \
-    exit 1; \
-    fi; \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin/; \
-    rm /tmp/chromedriver.zip; \
-    echo "ChromeDriver installation to /usr/local/bin/ completed successfully." 
-# Set Chromedriver path for Selenium
-ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver-linux64/chromedriver
+# Set environment variables
+ENV GOOGLE_CHROME_BIN=/usr/local/bin/chrome
+ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
 
 # Copy requirements file
 COPY requirements.txt /usr/src/app/requirements.txt
