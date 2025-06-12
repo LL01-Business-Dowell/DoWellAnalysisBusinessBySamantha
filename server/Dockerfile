@@ -65,14 +65,11 @@ RUN mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix && \
     mkdir -p /usr/src/app/logs && \
     chown -R chrome:chrome /usr/src/app
 
-# Skip migrations in Docker build, run at startup instead
-# RUN python manage.py makemigrations && python manage.py migrate
+# Run migrations
+RUN python manage.py makemigrations && python manage.py migrate
 
 # Expose the port
 EXPOSE 8000
 
-# Switch to chrome user for running the application
-USER chrome
-
-# Start Django server with migrations at runtime
-CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"]
+# Start Django server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
