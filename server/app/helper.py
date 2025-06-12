@@ -160,42 +160,28 @@ def extract_lat_lng(driver):
 
 
 def get_google_maps_details(url):
-    # Create a unique temporary directory for this session
-    temp_dir = tempfile.mkdtemp()
-    user_data_dir = os.path.join(temp_dir, f"chrome_user_data_{uuid.uuid4().hex}")
-    
-    options = Options()
+    options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--disable-web-security")
-    options.add_argument("--allow-running-insecure-content")
-    options.add_argument("--ignore-certificate-errors")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--disable-features=VizDisplayCompositor")
-    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--disable-dev-shm-usage")  # Important for VPS
     
-    # Add unique user data directory
-    options.add_argument(f"--user-data-dir={user_data_dir}")
-    
-    # Set Chrome binary path
+    # Get Chrome binary path from environment or use VPS installation path
     chrome_binary_path = os.environ.get('GOOGLE_CHROME_BIN')
-    if chrome_binary_path:
-        options.binary_location = chrome_binary_path
+    if not chrome_binary_path:
+        chrome_binary_path = "/usr/bin/google-chrome-stable"  # Your VPS Chrome path
+    options.binary_location = chrome_binary_path
     
-    # Set ChromeDriver path
+    # Get ChromeDriver path from environment or use VPS installation path
     chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
     if not chromedriver_path:
-        chromedriver_path = "/usr/local/bin/chromedriver"
+        chromedriver_path = "/usr/local/bin/chromedriver"  # Your VPS ChromeDriver path
     
     service = Service(chromedriver_path)
     
-    driver = None
+    driver = webdriver.Chrome(service=service, options=options)
+
     try:
-        driver = webdriver.Chrome(service=service, options=options)
-        
         delay = random.randint(3, 7)
         print(f"Waiting {delay} seconds before opening URL: {url}")
         time.sleep(delay)
@@ -231,108 +217,7 @@ def get_google_maps_details(url):
         }
 
     finally:
-        if driver:
-            try:
-                driver.quit()
-            except Exception as e:
-                print(f"Error closing driver: {e}")
-        
-        # Clean up temporary directory
-        try:
-            import shutil
-            shutil.rmtree(temp_dir, ignore_errors=True)
-        except Exception as e:
-            print(f"Error cleaning up temp directory: {e}")
-
-# Alternative approach using process ID if you prefer
-def get_google_maps_details_alt(url):
-    # Use process ID for uniqueness
-    process_id = os.getpid()
-    timestamp = int(time.time())
-    user_data_dir = f"/tmp/chrome_user_data_{process_id}_{timestamp}"
-    
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--disable-web-security")
-    options.add_argument("--allow-running-insecure-content")
-    options.add_argument("--ignore-certificate-errors")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--disable-features=VizDisplayCompositor")
-    options.add_argument("--window-size=1920,1080")
-    
-    # Add unique user data directory
-    options.add_argument(f"--user-data-dir={user_data_dir}")
-    
-    # Set Chrome binary path
-    chrome_binary_path = os.environ.get('GOOGLE_CHROME_BIN')
-    if chrome_binary_path:
-        options.binary_location = chrome_binary_path
-    
-    # Set ChromeDriver path
-    chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
-    if not chromedriver_path:
-        chromedriver_path = "/usr/local/bin/chromedriver"
-    
-    service = Service(chromedriver_path)
-    
-    driver = None
-    try:
-        driver = webdriver.Chrome(service=service, options=options)
-        
-        # Your existing scraping code here...
-        delay = random.randint(3, 7)
-        print(f"Waiting {delay} seconds before opening URL: {url}")
-        time.sleep(delay)
-
-        driver.get(url)
-        time.sleep(5)
-
-        # Rest of your code...
-        latitude, longitude = extract_lat_lng(driver)
-
-        details = {
-            "URL": url,
-            "Name": clean_text(driver.find_element(By.XPATH, "//h1[contains(@class, 'DUwDvf')]").text if driver.find_elements(By.XPATH, "//h1[contains(@class, 'DUwDvf')]") else "N/A"),
-            "Address": clean_text(driver.find_element(By.XPATH, "//button[@data-tooltip='Copy address']").text if driver.find_elements(By.XPATH, "//button[@data-tooltip='Copy address']") else "N/A"),
-            "Phone": clean_text(driver.find_element(By.XPATH, "//button[@data-tooltip='Copy phone number']").text if driver.find_elements(By.XPATH, "//button[@data-tooltip='Copy phone number']") else "N/A"),
-            "Rating": clean_text(driver.find_element(By.XPATH, "//span[@class='MW4etd']").text if driver.find_elements(By.XPATH, "//span[@class='MW4etd']") else "N/A"),
-            "Reviews": clean_text(driver.find_element(By.XPATH, "//span[@class='UY7F9']").text if driver.find_elements(By.XPATH, "//span[@class='UY7F9']") else "N/A"),
-            "Plus Code": clean_text(driver.find_element(By.XPATH, "//button[@data-tooltip='Copy plus code']").text if driver.find_elements(By.XPATH, "//button[@data-tooltip='Copy plus code']") else "N/A"),
-            "Website": clean_text(driver.find_element(By.XPATH, "//a[contains(@aria-label, 'Visit') or contains(@href, 'http')]").get_attribute("href") if driver.find_elements(By.XPATH, "//a[contains(@aria-label, 'Visit') or contains(@href, 'http')]") else "N/A"),
-            "Latitude": latitude,
-            "Longitude": longitude
-        }
-
-        return {
-            "success": True, 
-            "message": "Data retrieved successfully", 
-            "data": details
-        }
-
-    except Exception as e:
-        return {
-            "success": False, 
-            "message": str(e)
-        }
-
-    finally:
-        if driver:
-            try:
-                driver.quit()
-            except Exception as e:
-                print(f"Error closing driver: {e}")
-        
-        # Clean up user data directory
-        try:
-            import shutil
-            if os.path.exists(user_data_dir):
-                shutil.rmtree(user_data_dir, ignore_errors=True)
-        except Exception as e:
-            print(f"Error cleaning up user data directory: {e}")
+        driver.quit()
 
 def gemini_ai(api_key,prompt):
     client = genai.Client(api_key=api_key)
