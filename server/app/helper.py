@@ -12,10 +12,12 @@ import time
 import random
 import tempfile
 import uuid
-import shutil
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 # from google import genai
 import google.generativeai as genai
 
@@ -158,42 +160,28 @@ def extract_lat_lng(driver):
 #         driver.quit()
 
 def get_google_maps_details(url):
-    # Simple unique user data directory using process ID and timestamp
-    user_data_dir = f"/tmp/chrome_data_{os.getpid()}_{int(time.time() * 1000)}"
-    
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--no-first-run")
-    options.add_argument("--no-default-browser-check")
-    options.add_argument(f"--user-data-dir={user_data_dir}")
-    
-    # VPS Chrome and ChromeDriver paths
-    chrome_binary_path = os.environ.get('GOOGLE_CHROME_BIN', "/usr/bin/google-chrome-stable")
-    chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', "/usr/local/bin/chromedriver")
-    
-    options.binary_location = chrome_binary_path
-    service = Service(chromedriver_path)
-    
-    driver = None
-    try:
-        driver = webdriver.Chrome(service=service, options=options)
-        
-        delay = random.randint(3, 7)
-        print(f"Waiting {delay} seconds before opening URL: {url}")
-        time.sleep(delay)
+    options.add_argument("--window-size=1920,1080")
 
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+    try:
+        time.sleep(random.randint(2, 5))
         driver.get(url)
-        time.sleep(5)
+
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//h1[contains(@class, 'DUwDvf')]"))
+        )
 
         latitude, longitude = extract_lat_lng(driver)
 
         details = {
             "URL": url,
-            "Name": clean_text(driver.find_element(By.XPATH, "//h1[contains(@class, 'DUwDvf')]").text if driver.find_elements(By.XPATH, "//h1[contains(@class, 'DUwDvf')]") else "N/A"),
+            "Name": clean_text(driver.find_element(By.XPATH, "//h1[contains(@class, 'DUwDvf')]").text),
             "Address": clean_text(driver.find_element(By.XPATH, "//button[@data-tooltip='Copy address']").text if driver.find_elements(By.XPATH, "//button[@data-tooltip='Copy address']") else "N/A"),
             "Phone": clean_text(driver.find_element(By.XPATH, "//button[@data-tooltip='Copy phone number']").text if driver.find_elements(By.XPATH, "//button[@data-tooltip='Copy phone number']") else "N/A"),
             "Rating": clean_text(driver.find_element(By.XPATH, "//span[@class='MW4etd']").text if driver.find_elements(By.XPATH, "//span[@class='MW4etd']") else "N/A"),
@@ -205,31 +193,19 @@ def get_google_maps_details(url):
         }
 
         return {
-            "success": True, 
-            "message": "Data retrieved successfully", 
+            "success": True,
+            "message": "Data retrieved successfully",
             "data": details
         }
 
     except Exception as e:
         return {
-            "success": False, 
-            "message": str(e)
+            "success": False,
+            "message": f"Error fetching business info: {str(e)}"
         }
 
     finally:
-        if driver:
-            try:
-                driver.quit()
-            except Exception as e:
-                print(f"Error closing driver: {e}")
-        
-        # Clean up user data directory
-        try:
-            if os.path.exists(user_data_dir):
-                shutil.rmtree(user_data_dir, ignore_errors=True)
-        except Exception as e:
-            print(f"Error cleaning up user data directory: {e}")
-
+        driver.quit()
 
 def gemini_ai(api_key,prompt):
     client = genai.Client(api_key=api_key)
