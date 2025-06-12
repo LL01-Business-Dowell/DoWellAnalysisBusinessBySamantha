@@ -244,6 +244,8 @@ def format_swot_response(raw_text):
         raise Exception(f"Error formatting SWOT analysis: {str(e)}")
 
 def grok_api_call(prompt, api_key):
+
+    print("api key",api_key)
     url = "https://api.x.ai/v1/chat/completions"
     
     headers = {

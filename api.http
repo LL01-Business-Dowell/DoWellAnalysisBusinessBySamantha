@@ -58,7 +58,7 @@ curl -X POST "http://127.0.0.1:8000/v1/business-analysis/?type=linkedin_analysis
 
 ###
 
-curl -X POST "http://127.0.0.1:8000/v1/business-analysis/?type=google_review_analysis_report" \
+curl -X POST "https://samantaanalysis.uxlivinglab.online/api/v1/business-analysis/?type=google_review_analysis_report" \
      -H "Content-Type: application/json" \
      -d '{
           "email": "manish@dowellresearch.in",
