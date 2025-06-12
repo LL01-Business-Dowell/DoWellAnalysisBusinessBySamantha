@@ -70,6 +70,16 @@ def update_user_usage(email, occurrences):
 
 # DOWELL BUSINESS ANALYSIS
 
+def experience_database_services_google_reviews(email, occurrences):
+    url = "https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=experienced_service_user_details"
+    payload = {
+        "email":email,
+        "product_number":"UXLIVINGLAB012",
+        "occurrences":occurrences
+    }
+    response = requests.post(url, json=payload)
+    return response.text
+
 def clean_text(text):
     if text:
         text = re.sub(r"[^\x20-\x7E]", "", text)
@@ -232,3 +242,30 @@ def format_swot_response(raw_text):
         
     except Exception as e:
         raise Exception(f"Error formatting SWOT analysis: {str(e)}")
+
+def grok_api_call(prompt, api_key):
+    url = "https://api.x.ai/v1/chat/completions"
+    
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+    
+    data = {
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a test assistant."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "model": "grok-3-latest",
+        "stream": False,
+        "temperature": 0
+    }
+    
+    response = requests.post(url, headers=headers, json=data)
+    return response.json()

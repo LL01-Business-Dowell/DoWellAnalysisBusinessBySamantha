@@ -14,6 +14,7 @@ from threading import Thread
 load_dotenv()
 
 API_KEY = str(os.getenv("API_KEY"))
+GORK_API_KEY = str(os.getenv("GORK_API_KEY"))
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -34,6 +35,8 @@ class businessAnalysisBySamanta(APIView):
             return self.sowt_analysis_report(request)
         elif type == 'linkedin_analysis_report':
             return self.linkedin_analysis_report(request)
+        elif type == 'google_review_analysis_report':
+            return self.google_review_analysis_report(request)
         else:
             return self.handle_error(request)
         
@@ -304,6 +307,126 @@ class businessAnalysisBySamanta(APIView):
                 "error": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def google_review_analysis_report(self, request):
+        email = request.data.get('email')
+        occurrences = request.data.get('occurrences')
+        name = request.data.get('name')
+        address = request.data.get('address')
+        url = request.data.get('url')
+        phone = request.data.get('phone')
+        rating = request.data.get('rating')
+        reviews = request.data.get('reviews')
+        plus_code = request.data.get('plus_code')
+        website = request.data.get('website', None)
+        latitude = request.data.get('latitude')
+        longitude = request.data.get('longitude')
+
+        occurrences = int(occurrences) if occurrences is not None else 0
+
+        data = {
+            "email": email,
+            "occurrences": occurrences,
+            "name": name,
+            "address": address,
+            "url": url,
+            "phone": phone,
+            "rating": rating,
+            "reviews": reviews,
+            "plus_code": plus_code,
+            "website": website,
+            "latitude": latitude,
+            "longitude": longitude
+        }
+
+        print("✅ Data received:", data)
+
+        serializer = AnalysisSerializer(data=data)
+        if not serializer.is_valid():
+            print("❌ Serializer Errors:", serializer.errors)
+            return Response({
+                "success": False,
+                "message": "Posting wrong data to API",
+                "error": serializer.errors,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        experience_database_service_response = json.loads(experience_database_services_google_reviews(email, occurrences))
+        print("🛑 Experience Database Response:", experience_database_service_response)
+
+        if not experience_database_service_response.get("success"):
+            return Response({
+                "success": False,
+                "message": experience_database_service_response.get("message", "Failed to save experience")
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        occurrences += 1
+
+
+        try:
+            google_review_text = grok_api_call(f"Deep Swot analysis on Google reviews of Cafe Name {name} {address}", GORK_API_KEY)
+
+            print("🛑 SWOT Text Response:")
+
+            if not google_review_text:
+                return Response({
+                    "success": False,
+                    "message": "Failed to retrieve SWOT analysis results"
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            def save_experienced_data():
+                try:
+                    save_experienced_product_data(
+                        "DOWELL REVIEWS ANALYSIS",
+                        email,
+                        {
+                            "email": email,
+                            "name": name,
+                            "address": address,
+                            "url": url,
+                            "phone": phone,
+                            "rating": rating,
+                            "reviews": reviews,
+                            "plus_code": plus_code,
+                            "website": website,
+                            "latitude": latitude,
+                            "longitude": longitude,
+                            "swot_analysis": google_review_text,
+                            "timestamp": datetime.datetime.now().isoformat()
+                        }
+                    )
+                    print("✅ Experienced data saved successfully")
+                except Exception as e:
+                    print("🛑 Error saving experienced data:", e)
+            
+            def reduce_experienced_counts():
+                try:
+                    a= update_user_usage(email, occurrences)
+                    print("✅ Experience count updated successfully",a)
+                except Exception as e:
+                    print("🛑 Error updating experience count:", e)
+
+            print("🚀 Starting background threads")
+
+            experienced_date = Thread(target=save_experienced_data)
+            experienced_date.daemon = True
+            experienced_date.start()
+
+            experienced_reduce = Thread(target=reduce_experienced_counts)
+            experienced_reduce.daemon = True
+            experienced_reduce.start()
+
+            return Response({
+                "success": True,
+                "message": "Data retrieved successfully",
+                "response": google_review_text
+            })
+
+        except Exception as e:
+            print("🛑 Exception Occurred:", e)
+            return Response({
+                "success": False,
+                "message": "Failed to retrieve SWOT analysis results",
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def handle_error(self, request): 
         return Response({
