@@ -8,13 +8,15 @@ import re
 import json
 import os
 import csv
+import os
 import time
 import random
 import tempfile
 import uuid
+import shutil
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
@@ -172,64 +174,39 @@ def get_google_maps_details(url):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
+    options.add_argument("--remote-debugging-port=9222")
     options.add_argument("--window-size=1920,1080")
-    
-    # Additional arguments for Docker stability
     options.add_argument("--disable-extensions")
+    options.add_argument("--no-first-run")
+    options.add_argument("--disable-default-apps")
+    options.add_argument("--disable-translate")
     options.add_argument("--disable-plugins")
-    options.add_argument("--disable-images")
-    options.add_argument("--disable-javascript")
-    options.add_argument("--disable-css")
-    options.add_argument("--disable-web-security")
-    options.add_argument("--allow-running-insecure-content")
-    options.add_argument("--ignore-certificate-errors")
-    options.add_argument("--ignore-ssl-errors")
-    options.add_argument("--ignore-certificate-errors-spki-list")
-    options.add_argument("--disable-features=VizDisplayCompositor")
-    options.add_argument("--disable-ipc-flooding-protection")
+    options.add_argument("--disable-background-timer-throttling")
     options.add_argument("--disable-renderer-backgrounding")
     options.add_argument("--disable-backgrounding-occluded-windows")
-    options.add_argument("--disable-field-trial-config")
-    options.add_argument("--disable-back-forward-cache")
-    options.add_argument("--disable-default-apps")
-    options.add_argument("--no-first-run")
-    options.add_argument("--no-default-browser-check")
+    options.add_argument("--disable-ipc-flooding-protection")
+    options.add_argument("--single-process")  # Important for Docker
     options.add_argument("--disable-logging")
-    options.add_argument("--disable-background-timer-throttling")
-    options.add_argument("--disable-backgrounding-occluded-windows")
-    options.add_argument("--disable-client-side-phishing-detection")
     options.add_argument("--disable-crash-reporter")
-    options.add_argument("--disable-oopr-debug-crash-dump")
-    options.add_argument("--no-crash-upload")
-    options.add_argument("--disable-low-res-tiling")
-    options.add_argument("--disable-background-networking")
-    options.add_argument("--disable-background-sync")
-    options.add_argument("--disable-push-messaging")
-    options.add_argument("--disable-sync")
-    options.add_argument("--disable-translate")
-    options.add_argument("--hide-scrollbars")
-    options.add_argument("--mute-audio")
-    options.add_argument("--disable-notifications")
-    options.add_argument("--disable-permissions-api")
-    options.add_argument("--disable-presentation-api")
-    options.add_argument("--disable-speech-api")
-    options.add_argument("--remote-debugging-port=9222")
-    
-    # User data directory to prevent conflicts
+    options.add_argument("--disable-in-process-stack-traces")
     options.add_argument(f"--user-data-dir={user_data_dir}")
     
-    # Chrome binary location for Docker
+    # Use environment variable for Chrome binary (set by Dockerfile)
     chrome_binary = os.environ.get('GOOGLE_CHROME_BIN', '/usr/local/bin/chrome')
     options.binary_location = chrome_binary
     
     driver = None
     try:
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        # Use environment variable for ChromeDriver (set by Dockerfile)
+        chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', '/usr/local/bin/chromedriver')
+        service = Service(chromedriver_path)
+        
+        driver = webdriver.Chrome(service=service, options=options)
         
         time.sleep(random.randint(2, 5))
         driver.get(url)
 
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.XPATH, "//h1[contains(@class, 'DUwDvf')]"))
         )
 
@@ -269,11 +246,83 @@ def get_google_maps_details(url):
         
         # Clean up temporary directory
         try:
-            import shutil
             shutil.rmtree(temp_dir, ignore_errors=True)
         except Exception as e:
             print(f"Error cleaning up temp directory: {e}")
 
+
+# Alternative version using WebDriverManager (fallback)
+def get_google_maps_details_webdriver_manager(url):
+    temp_dir = tempfile.mkdtemp()
+    user_data_dir = os.path.join(temp_dir, f"chrome_user_data_{uuid.uuid4().hex}")
+    
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--remote-debugging-port=9222")
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--single-process")
+    options.add_argument(f"--user-data-dir={user_data_dir}")
+    
+    # Let WebDriverManager handle the Chrome binary and driver
+    chrome_binary = os.environ.get('GOOGLE_CHROME_BIN')
+    if chrome_binary:
+        options.binary_location = chrome_binary
+    
+    driver = None
+    try:
+        # Use WebDriverManager as fallback
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=options)
+        
+        time.sleep(random.randint(2, 5))
+        driver.get(url)
+
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "//h1[contains(@class, 'DUwDvf')]"))
+        )
+
+        latitude, longitude = extract_lat_lng(driver)
+
+        details = {
+            "URL": url,
+            "Name": clean_text(driver.find_element(By.XPATH, "//h1[contains(@class, 'DUwDvf')]").text),
+            "Address": clean_text(driver.find_element(By.XPATH, "//button[@data-tooltip='Copy address']").text if driver.find_elements(By.XPATH, "//button[@data-tooltip='Copy address']") else "N/A"),
+            "Phone": clean_text(driver.find_element(By.XPATH, "//button[@data-tooltip='Copy phone number']").text if driver.find_elements(By.XPATH, "//button[@data-tooltip='Copy phone number']") else "N/A"),
+            "Rating": clean_text(driver.find_element(By.XPATH, "//span[@class='MW4etd']").text if driver.find_elements(By.XPATH, "//span[@class='MW4etd']") else "N/A"),
+            "Reviews": clean_text(driver.find_element(By.XPATH, "//span[@class='UY7F9']").text if driver.find_elements(By.XPATH, "//span[@class='UY7F9']") else "N/A"),
+            "Plus Code": clean_text(driver.find_element(By.XPATH, "//button[@data-tooltip='Copy plus code']").text if driver.find_elements(By.XPATH, "//button[@data-tooltip='Copy plus code']") else "N/A"),
+            "Website": clean_text(driver.find_element(By.XPATH, "//a[contains(@aria-label, 'Visit') or contains(@href, 'http')]").get_attribute("href") if driver.find_elements(By.XPATH, "//a[contains(@aria-label, 'Visit') or contains(@href, 'http')]") else "N/A"),
+            "Latitude": latitude,
+            "Longitude": longitude
+        }
+
+        return {
+            "success": True,
+            "message": "Data retrieved successfully",
+            "data": details
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error fetching business info: {str(e)}"
+        }
+
+    finally:
+        if driver:
+            try:
+                driver.quit()
+            except Exception:
+                pass
+        
+        try:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        except Exception:
+            pass
 
 
 def gemini_ai(api_key,prompt):
