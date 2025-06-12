@@ -8,15 +8,14 @@ import re
 import json
 import os
 import csv
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-import os
 import time
 import random
 import tempfile
 import uuid
+import shutil
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 # from google import genai
 import google.generativeai as genai
 
@@ -158,30 +157,31 @@ def extract_lat_lng(driver):
 #     finally:
 #         driver.quit()
 
-
 def get_google_maps_details(url):
+    # Simple unique user data directory using process ID and timestamp
+    user_data_dir = f"/tmp/chrome_data_{os.getpid()}_{int(time.time() * 1000)}"
+    
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")  # Important for VPS
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--no-first-run")
+    options.add_argument("--no-default-browser-check")
+    options.add_argument(f"--user-data-dir={user_data_dir}")
     
-    # Get Chrome binary path from environment or use VPS installation path
-    chrome_binary_path = os.environ.get('GOOGLE_CHROME_BIN')
-    if not chrome_binary_path:
-        chrome_binary_path = "/usr/bin/google-chrome-stable"  # Your VPS Chrome path
+    # VPS Chrome and ChromeDriver paths
+    chrome_binary_path = os.environ.get('GOOGLE_CHROME_BIN', "/usr/bin/google-chrome-stable")
+    chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', "/usr/local/bin/chromedriver")
+    
     options.binary_location = chrome_binary_path
-    
-    # Get ChromeDriver path from environment or use VPS installation path
-    chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
-    if not chromedriver_path:
-        chromedriver_path = "/usr/local/bin/chromedriver"  # Your VPS ChromeDriver path
-    
     service = Service(chromedriver_path)
     
-    driver = webdriver.Chrome(service=service, options=options)
-
+    driver = None
     try:
+        driver = webdriver.Chrome(service=service, options=options)
+        
         delay = random.randint(3, 7)
         print(f"Waiting {delay} seconds before opening URL: {url}")
         time.sleep(delay)
@@ -217,7 +217,19 @@ def get_google_maps_details(url):
         }
 
     finally:
-        driver.quit()
+        if driver:
+            try:
+                driver.quit()
+            except Exception as e:
+                print(f"Error closing driver: {e}")
+        
+        # Clean up user data directory
+        try:
+            if os.path.exists(user_data_dir):
+                shutil.rmtree(user_data_dir, ignore_errors=True)
+        except Exception as e:
+            print(f"Error cleaning up user data directory: {e}")
+
 
 def gemini_ai(api_key,prompt):
     client = genai.Client(api_key=api_key)
