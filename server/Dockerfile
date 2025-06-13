@@ -1,41 +1,54 @@
-# Use full Debian-based image (not slim)
 FROM python:3.11
 
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Install dependencies for Selenium & Chrome
+# Install dependencies for Selenium & Chrome (with additional libraries)
 RUN apt-get update --fix-missing && \
-    apt-get install -y --no-install-recommends -f \
-    wget curl unzip gnupg \
-    libx11-6 libxcb1 libxcomposite1 libxdamage1 libxext6 libxfixes3 \
-    libxkbcommon0 libxrandr2 xdg-utils libglib2.0-0 libnss3 libgconf-2-4 \
-    libx11-xcb1 libxcursor1 libxi6 libxrender1 libdbus-glib-1-2 libgtk-3-0 && \
+    apt-get install -y --no-install-recommends \
+    wget curl unzip gnupg ca-certificates \
+    fonts-liberation libasound2 libatk-bridge2.0-0 libatk1.0-0 \
+    libatspi2.0-0 libcairo2 libcups2 libdbus-1-3 libdrm2 \
+    libgbm1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libwayland-client0 \
+    libx11-6 libx11-xcb1 libxcb1 libxcb-dri3-0 libxcomposite1 \
+    libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxkbcommon0 \
+    libxrandr2 libxrender1 libxss1 libxtst6 xdg-utils && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Google Chrome
-RUN apt-get update --fix-missing && apt-get install -f -y && \
-    wget -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y /tmp/chrome.deb && rm /tmp/chrome.deb
+# Get latest stable Chrome version and install matching Chrome + ChromeDriver
+RUN set -eux; \
+    # Get the latest stable version
+    CHROME_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" | \
+    python3 -c "import sys, json; print(json.load(sys.stdin)['channels']['Stable']['version'])"); \
+    echo "Using Chrome version: ${CHROME_VERSION}"; \
+    \
+    # Download and install Chrome
+    wget -O /tmp/chrome-linux64.zip "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip"; \
+    unzip /tmp/chrome-linux64.zip -d /opt/; \
+    ln -sf /opt/chrome-linux64/chrome /usr/local/bin/chrome; \
+    \
+    # Download and install matching ChromeDriver
+    wget -O /tmp/chromedriver-linux64.zip "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip"; \
+    unzip /tmp/chromedriver-linux64.zip -d /opt/; \
+    ln -sf /opt/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver; \
+    \
+    # Cleanup
+    rm /tmp/chrome-linux64.zip /tmp/chromedriver-linux64.zip; \
+    \
+    # Make executables and verify installation
+    chmod +x /usr/local/bin/chrome /usr/local/bin/chromedriver; \
+    \
+    # Test Chrome installation
+    /usr/local/bin/chrome --version || echo "Chrome test failed"; \
+    /usr/local/bin/chromedriver --version || echo "ChromeDriver test failed"
 
-# Set Chrome binary path for Selenium
-ENV GOOGLE_CHROME_BIN=/usr/bin/google-chrome
+# Create a non-root user for Chrome
+RUN groupadd -r chrome && useradd -r -g chrome -G audio,video chrome \
+    && mkdir -p /home/chrome && chown -R chrome:chrome /home/chrome
 
-# Install Chromedriver
-# Install Chromedriver using LATEST_RELEASE
-# Install Chromedriver using LATEST_RELEASE_STABLE (Corrected URL)
-RUN set -eux; CHROME_DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"); \
-    echo "ChromeDriver LATEST_RELEASE Version: ${CHROME_DRIVER_VERSION}"; \ 
-    wget -O /tmp/chromedriver.zip "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.53/linux64/chromedriver-linux64.zip"; \
-    if [ ! -s /tmp/chromedriver.zip ]; then \ 
-    echo "ERROR: ChromeDriver zip file download failed or resulted in empty file!"; \
-    exit 1; \
-    fi; \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin/; \
-    rm /tmp/chromedriver.zip; \
-    echo "ChromeDriver installation to /usr/local/bin/ completed successfully." 
-# Set Chromedriver path for Selenium
-ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver-linux64/chromedriver
+# Set environment variables
+ENV GOOGLE_CHROME_BIN=/usr/local/bin/chrome
+ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
 
 # Copy requirements file
 COPY requirements.txt /usr/src/app/requirements.txt
@@ -46,6 +59,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy the rest of the Django app
 COPY . /usr/src/app
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix && \
+    mkdir -p /usr/src/app/logs && \
+    chown -R chrome:chrome /usr/src/app
 
 # Run migrations
 RUN python manage.py makemigrations && python manage.py migrate

@@ -74,3 +74,6 @@ curl -X POST "https://samantaanalysis.uxlivinglab.online/api/v1/business-analysi
           "latitude": 9.9852108,
           "longitude":76.2826996
      }'
+
+
+
