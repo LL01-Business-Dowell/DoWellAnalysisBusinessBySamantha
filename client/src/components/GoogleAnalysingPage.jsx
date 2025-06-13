@@ -323,7 +323,7 @@ function GoogleAnalysingPage() {
         <body>
           <div class="header">
             <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
-            <h1> 'Business Google Reviews analysis from Samanta AI... analysing customer perspectives'}</h1>
+            <h1> Business Google Reviews analysis from Samanta AI... analysing customer perspectives</h1>
             <p class="date">Generated on ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
           </div>
           

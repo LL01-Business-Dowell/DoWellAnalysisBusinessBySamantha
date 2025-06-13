@@ -122,21 +122,11 @@ function EmailPage() {
     try {
       setIsLoading(true)
       let response = null;
-      const path = window.location.pathname;
-      if( path === "") {
-        response = await getUser(email)
 
-      } else if (path === "/google") {
-        response = await getUserGoogle(email)
-      }
+        response = await getUser(email)
       
       if(response.occurrences == 0) {
-        if( path === "") {
           await register(email)
-
-        } else if (path === "/google") {
-            await registerGoogle(email)
-        }
         
       }
 
