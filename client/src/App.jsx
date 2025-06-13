@@ -12,7 +12,7 @@ function App() {
       <BrowserRouter>
       <Routes>
           <Route path="/" element={<MapPage />} />
-          <Route path="/google" element={<GooglePage />} />
+          <Route path="/google-review-analysis" element={<GooglePage />} />
           <Route path="/linkedIn" element={<LinkedInPage/>} />
           <Route path="/review" element={<ReviewPage />} />
           <Route path="*" element={<NotFoundPage />} />

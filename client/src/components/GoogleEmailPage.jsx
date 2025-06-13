@@ -87,9 +87,9 @@ function GoogleEmailPage() {
       const paymentData = {
         callback_url: "https://dowellpay.online/thank-you",
         currency_code: userInfo.currency || "INR", // Fallback to INR if no currency found
-        description: "Payment link for linkedin analyzer",
+        description: "Payment link for Business Google Reviews analyzer",
         price: parseFloat(price.replace(/[^\d.]/g, '')),
-        product: "Samanta Linkedin Analyzer",
+        product: "Samanta Google Reviews Analyzer",
         timezone: userInfo.timeZone || "Asia/Kolkata"
       };
 
@@ -281,7 +281,7 @@ function GoogleEmailPage() {
               <div className="p-6">
                 <div className="flex flex-col items-center mb-4">
                 <p className="text-gray-700">
-                    To leverage the in-depth insights provided by Samanta Business Analysis, a fee is required. 
+                    To leverage the in-depth insights provided by Samanta Google Reviews Analysis, a fee is required. 
                     You will receive a detailed invoice and a secure payment link directly to your email, 
                     accompanied by your analysis report. 
                   </p>
@@ -325,7 +325,7 @@ function GoogleEmailPage() {
         <p onClick= {handleWebsite} className='text-gray-500 text-sm mt-5 cursor-pointer'>DoWell UX Living Lab</p>
         <div className="flex justify-center items-center mt-5">
   <img 
-    src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fsamantaanalysis.uxlivinglab.online%2F&labelColor=%2337d67a&countColor=%23d9e3f0&style=plastic" 
+    src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fsamantaanalysis.uxlivinglab.online%2Fgoogle-review-analysis&labelColor=%2337d67a&countColor=%23263759&style=plastic" 
     alt="Visitor Badge" 
   />
 </div>

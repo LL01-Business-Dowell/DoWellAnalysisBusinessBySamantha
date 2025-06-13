@@ -24,73 +24,102 @@ function GoogleAnalysingPage() {
 
 
     const formatResponse = () => {
-
-      if (!swotAnalysisData) return [];
+  if (!swotAnalysisData) return [];
+  
+  // Extract the actual content string from the API response
+  let contentString = '';
+  
+  // Handle different possible response structures
+  if (typeof swotAnalysisData === 'string') {
+    contentString = swotAnalysisData;
+  } else if (swotAnalysisData.choices && swotAnalysisData.choices[0]) {
+    contentString = swotAnalysisData.choices[0].message.content;
+  } else if (swotAnalysisData.response && swotAnalysisData.response.choices && swotAnalysisData.response.choices[0]) {
+    contentString = swotAnalysisData.response.choices[0].message.content;
+  } else if (swotAnalysisData.content) {
+    contentString = swotAnalysisData.content;
+  } else {
+    console.error('Unable to extract content from swotAnalysisData:', swotAnalysisData);
+    return [];
+  }
+  
+  const sections = [];
+  let currentSection = null;
+  let title = 'Business Google Reviews analysis'; // Default title
+  
+  // Split content into lines for processing
+  const lines = contentString.split('\n');
+  
+  // Add the main title section first
+  sections.push({ heading: title, content: [] });
+  
+  // Process each line to extract sections
+  lines.forEach(line => {
+    const trimmedLine = line.trim();
+    
+    // Handle main section headers (### **Strengths**, ### **Weaknesses**, etc.)
+    if (trimmedLine.startsWith('### **') && trimmedLine.endsWith('**')) {
+      currentSection = trimmedLine.replace('### **', '').replace('**', '');
+      sections.push({ heading: currentSection, content: [] });
+    }
+    // Handle numbered list items (1. **Item Name**: Description)
+    else if (/^\d+\.\s\*\*/.test(trimmedLine) && currentSection) {
+      const item = trimmedLine
+        .replace(/^\d+\.\s/, '') // Remove number and dot
+        .replace(/\*\*/g, ''); // Remove bold formatting
       
-        const sections = [];
-        let currentSection = null;
-        let title = '';
-        
-        // Split content into lines for processing
-        const lines = swotAnalysisData.split('\n');
-        
-        // Process each line to extract sections
-        lines.forEach(line => {
-        const trimmedLine = line.trim();
-        
-        // Extract main title (### **SWOT Analysis of....**)
-        if (trimmedLine.startsWith('### **') && trimmedLine.includes('SWOT Analysis')) {
-            title = trimmedLine
-            .replace('### **', '')
-            .replace('**', '')
-            .replace('SWOT Analysis of ', '')
-            .replace(' Based on Google Reviews', '');
-            sections.push({ heading: title, content: [] });
-        }
-        // Handle section headers (#### **Strengths**, #### **Weaknesses**, etc.)
-        else if (trimmedLine.startsWith('#### **') && trimmedLine.endsWith('**')) {
-            currentSection = trimmedLine.replace('#### **', '').replace('**', '');
-            sections.push({ heading: currentSection, content: [] });
-        }
-        // Handle numbered list items (1. **Item Name**: Description)
-        else if (/^\d+\.\s\*\*/.test(trimmedLine) && currentSection) {
-            // Extract the numbered item
-            const item = trimmedLine
-            .replace(/^\d+\.\s/, '') // Remove number and dot
-            .replace(/\*\*/g, ''); // Remove bold formatting
-            
-            if (item.trim().length > 0) {
-            sections[sections.length - 1].content.push(item);
-            }
-        }
-        // Handle section headers for other parts (### **Detailed Insights**, ### **Conclusion**)
-        else if (trimmedLine.startsWith('### **') && !trimmedLine.includes('SWOT Analysis')) {
-            currentSection = trimmedLine.replace('### **', '').replace('**', '');
-            sections.push({ heading: currentSection, content: [] });
-        }
-        // Handle numbered items in other sections
-        else if (/^\d+\.\s\*\*/.test(trimmedLine) && (currentSection === 'Detailed Insights and Recommendations')) {
-            const item = trimmedLine
-            .replace(/^\d+\.\s/, '')
-            .replace(/\*\*/g, '');
-            
-            if (item.trim().length > 0) {
-            sections[sections.length - 1].content.push(item);
-            }
-        }
-        // Handle conclusion content (paragraph text)
-        else if (currentSection === 'Conclusion' && trimmedLine.length > 0 && !trimmedLine.startsWith('---')) {
-            // For conclusion, we'll treat each sentence as a content item
-            if (trimmedLine.trim().length > 0) {
-            sections[sections.length - 1].content.push(trimmedLine);
-            }
-        }
-        });
-        
-        return sections;
+      if (item.trim().length > 0) {
+        sections[sections.length - 1].content.push(item);
+      }
+    }
+    // Handle bullet points with sub-items (- *Evidence*: text)
+    else if (trimmedLine.startsWith('- ') && currentSection) {
+      const item = trimmedLine
+        .replace(/^-\s/, '') // Remove dash and space
+        .replace(/\*/g, ''); // Remove asterisks
       
+      if (item.trim().length > 0) {
+        sections[sections.length - 1].content.push(item);
+      }
+    }
+    // Handle simple bullet points (* text)
+    else if (trimmedLine.startsWith('* ') && currentSection) {
+      const item = trimmedLine
+        .replace(/^\*\s/, '') // Remove asterisk and space
+        .replace(/\*\*/g, ''); // Remove bold formatting
       
-    };
+      if (item.trim().length > 0) {
+        sections[sections.length - 1].content.push(item);
+      }
+    }
+    // Handle other section headers (### **Methodology**, ### **Conclusion**)
+    else if (trimmedLine.startsWith('### **') && !sections.some(s => s.heading === currentSection)) {
+      currentSection = trimmedLine.replace('### **', '').replace('**', '');
+      sections.push({ heading: currentSection, content: [] });
+    }
+    // Handle conclusion content and other paragraph text
+    else if (currentSection && trimmedLine.length > 0 && !trimmedLine.startsWith('---') && !trimmedLine.startsWith('For now') && !trimmedLine.startsWith('Conducting')) {
+      // Skip introductory paragraphs, focus on actionable content
+      if (trimmedLine.includes(':') || currentSection === 'Conclusion' || currentSection === 'Methodology for Analysis' || currentSection === 'Conclusion and Recommendations') {
+        sections[sections.length - 1].content.push(trimmedLine);
+      }
+    }
+  });
+  
+  // Filter out empty sections and the initial empty title section
+  const filteredSections = sections.filter(section => 
+    section.content.length > 0 && section.heading !== 'Business Analysis'
+  );
+  
+  // Extract business name from content if available
+  const businessNameMatch = contentString.match(/(?:Cafe Name\s+)?([A-Za-z\s]+)(?:\s+\(located at|,)/);
+  const businessName = businessNameMatch ? businessNameMatch[1].trim() : 'Your Business';
+  
+  // Add the title section back with extracted business name
+  filteredSections.unshift({ heading: businessName, content: [] });
+  
+  return filteredSections;
+};
     
     const handleEmail = async () => {
       const analysisData = formatResponse();
@@ -100,7 +129,7 @@ function GoogleAnalysingPage() {
       // Build the feedback URL base
       const feedbackBaseUrl = "https://www.scales.uxlivinglab.online/api/v1/create-response/?user=True&scale_type=nps&channel=channel_1&instance=instance_1&workspace_id=6385c0e48eca0fb652c9447b&username=HeenaK&scale_id=665d95ae7ee426d671222a7b&item=";
       
-      const productUrl = "https://samantaanalysis.uxlivinglab.online/"
+      const productUrl = "https://samantaanalysis.uxlivinglab.online/google-review-analysis"
       const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -294,7 +323,7 @@ function GoogleAnalysingPage() {
         <body>
           <div class="header">
             <img src="https://dowellfileuploader.uxlivinglab.online/hr/logo-2-min-min.png" alt="Company Logo" class="logo" />
-            <h1>${analysisData[0]?.heading ? `Business analysis of ${analysisData[0].heading} from Samanta AI... analysing customer perspectives` : 'Business analysis from Samanta AI... analysing customer perspectives'}</h1>
+            <h1> 'Business Google Reviews analysis from Samanta AI... analysing customer perspectives'}</h1>
             <p class="date">Generated on ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
           </div>
           
@@ -351,7 +380,7 @@ function GoogleAnalysingPage() {
         const emailData = {
           toname: email, 
           toemail: email, 
-          subject: '🚀 Business analysis from Samanta AI... analysing customer perspectives',
+          subject: '🚀 Business Google Reviews analysis from Samanta AI... analysing customer perspectives',
           email_content: htmlContent,
         };
     
@@ -382,7 +411,7 @@ function GoogleAnalysingPage() {
                 occurrences: occurrences
                 })
                 
-                setSwotAnalysisData(swotResponse.response)
+                setSwotAnalysisData(swotResponse.response.choices[0].message.content)
                 setIsAnalysisComplete(true)
                 setIsAnalysing(false)
 
